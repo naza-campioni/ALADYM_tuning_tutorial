@@ -3,18 +3,18 @@ project:
   output-dir: docs
 
 website:
-  title: "SEAwise – BEMTOOL tutorial"
+  title: "ALADYM Tuning tutorial"
   search: false
   navbar:
     title: false
-    logo: pics/SeaWiseFinal-01.png
+    logo: COISPA_colour.png
     left:
-      - href: BEMTOOL_tutorialMSE.qmd
+      - href: ALADYM_tuning_tutorial.qmd
     right:
-      - text: "SEAwise Website"
-        href: https://seawiseproject.org/
-      - text: "SEAwise Github"
-        href: https://github.com/ices-tools-dev/SEAwise
+      - text: "Fondazione COISPA Website"
+        href: https://www.fondazionecoispa.org/
+      - text: "COISPA Github"
+        href: https://github.com/COISPA
 
 format:
   html:
@@ -25,7 +25,7 @@ format:
     toc-title: "Index"
     number-sections: false
     df-print: paged
-    include-in-header: assets/icons.html
+    include-in-header: icons.html
     theme: default
     smooth-scroll: true
     css: styles-quarto.css
