@@ -1,0 +1,515 @@
+---
+title: "ALADYM_tuning_tutorial"
+author: "Nazareno Campioni"
+format: html
+editor: 
+  markdown:
+    wrap: 72
+---
+
+```{r, echo=FALSE}
+cat(sprintf("Compiled on %s\n\n", format(Sys.time(), '%d/%m/%Y, %H:%M')))
+```
+
+<!-- Logo in the title -->
+
+```{=html}
+<style>
+/* Make the title line a flex row with the logo on the left */
+.title-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;              /* spacing between logo and text */
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+.title-with-logo img {
+  width: 120px;           /* adjust logo size as needed */
+  height: auto;
+}
+</style>
+```
+
+```{=html}
+<script>
+// Wrap the H1.title with a container and prepend the logo to its left
+document.addEventListener("DOMContentLoaded", function(){
+  // find the auto-generated title element
+  var h1 = document.querySelector("h1.title");
+  if(!h1) return;
+
+  // create wrapper
+  var wrap = document.createElement("div");
+  wrap.className = "title-with-logo";
+
+  // create logo
+  var img = document.createElement("img");
+  img.src = "COISPA_colour.png";   // relative path from Rmd root
+  img.alt = "COISPA logo";
+
+  // insert: wrap replaces h1, then put logo + h1 inside wrap
+  h1.parentNode.insertBefore(wrap, h1);
+  wrap.appendChild(img);
+  wrap.appendChild(h1);
+});
+</script>
+```
+
+<!-- Links -->
+
+::: {#header-links}
+<a href="https://www.fondazionecoispa.org/" target="_blank">
+![](COISPA_colour.png){style="margin-right:6px; vertical-align:middle;"}
+Fondazione COISPA Website </a>
+<a href="https://github.com/COISPA" target="_blank">
+<img src="github.svg" width="20" height="22" style="margin-right:6px; vertical-align:middle;"/>
+COISPA Github </a>
+:::
+
+<!-- start of the script -->
+
+# Introduction
+
+**r / Fbar tuning: how to generate and run combinations**
+
+-   **Define the parameter ranges** 
+
+<!-- -->
+
+-   Open ALADYM_tuning_main_config.R 
+
+<!-- -->
+
+-   Edit the vectors defining the grid: 
+
+<!-- -->
+
+-   tr_values \<- c(...) 
+
+<!-- -->
+
+-   Fbar_values \<- c(...) 
+
+<!-- -->
+
+-   The script uses these vectors to generate all combinations
+    (Cartesian product) 
+
+<!-- -->
+
+-   **Prepare the base configuration file** 
+
+<!-- -->
+
+-   Use a valid ALADYM configuration as template 
+
+<!-- -->
+
+-   Ensure: 
+
+<!-- -->
+
+-   M-at-age starts from age 0 
+
+<!-- -->
+
+-   All missing values are written as "NAN" (not NA) 
+
+<!-- -->
+
+-   The script assumes this file follows the expected ALADYM structure 
+
+<!-- -->
+
+-   **Run the configuration generator** 
+
+<!-- -->
+
+-   Execute ALADYM_tuning_main_config.R 
+
+<!-- -->
+
+-   The script: 
+
+<!-- -->
+
+-   Creates one configuration file per (tr, Fbar) combination 
+
+<!-- -->
+
+-   Automatically assigns a unique combo tag (e.g. 0.2_0.5) 
+
+<!-- -->
+
+-   Saves all generated configs into: 
+
+C:/INPUT/ALADYM/ 
+
+-   **Run the tuning** 
+
+<!-- -->
+
+-   Launch the main tuning script (e.g. ALADYM_tuning.R) 
+
+<!-- -->
+
+-   The script: 
+
+<!-- -->
+
+-   Iterates over all configuration files 
+
+<!-- -->
+
+-   Runs ALADYM once per configuration 
+
+<!-- -->
+
+-   Extracts outputs (SSB, Fbar, catch, etc.) 
+
+<!-- -->
+
+-   Computes the score for each run 
+
+<!-- -->
+
+-   Stores results in: 
+
+<!-- -->
+
+-   CAL\$score 
+
+<!-- -->
+
+-   CAL\$errors 
+
+<!-- -->
+
+-   One output folder per combo 
+
+<!-- -->
+
+-   **Generate diagnostics** 
+
+<!-- -->
+
+-   Run the diagnostics plotting section 
+
+<!-- -->
+
+-   This automatically produces: 
+
+<!-- -->
+
+-   Fan plots (all combinations vs observed) 
+
+<!-- -->
+
+-   Best-combo plots 
+
+<!-- -->
+
+-   CSV summary of scores 
+
+<!-- -->
+
+-   Outputs are saved in: 
+
+<!-- -->
+
+-   Combo_runs_diagnostics/ 
+
+<!-- -->
+
+-   Best_combo_diagnostics/ 
+
+<!-- -->
+
+-   **Select the best candidate** 
+
+<!-- -->
+
+-   Identify: 
+
+<!-- -->
+
+-   The lowest-score combination 
+
+<!-- -->
+
+-   This selected combination becomes the fixed input for Step 2 
+
+<!-- -->
+
+-   **Purpose of the tuning** 
+
+<!-- -->
+
+-   Why tr and Fbar are influential parameters 
+
+<!-- -->
+
+-   Exploratory, automated calibration 
+
+<!-- -->
+
+-   **Experimental design** 
+
+<!-- -->
+
+-   Definition of tr range 
+
+<!-- -->
+
+-   Definition of Fbar range 
+
+<!-- -->
+
+-   How the parameter grid is constructed 
+
+<!-- -->
+
+-   **Model outputs used for evaluation** 
+
+<!-- -->
+
+-   Annual SSB time series 
+
+<!-- -->
+
+-   Annual Fbar time series 
+
+<!-- -->
+
+-   Total catch time series 
+
+<!-- -->
+
+-   **Definition of the score** 
+
+<!-- -->
+
+-   Relative error formulation 
+
+<!-- -->
+
+-   Use of mean squared relative error 
+
+<!-- -->
+
+-   Limitations (e.g. shape mismatches, timing mismatches, compensating
+    errors) 
+
+# **Step 2 — Selectivity tuning: how to generate and run combinations** 
+
+-   **Start from the best tr/Fbar combination** 
+
+<!-- -->
+
+-   Fix tr and Fbar to the values selected in Step 1 
+
+<!-- -->
+
+-   All further experiments modify only selectivity parameters 
+
+<!-- -->
+
+-   **Define the selectivity parameter space** 
+
+<!-- -->
+
+-   Open the selectivity tuning script (e.g. ALADYM_tuning_sel.R) 
+
+<!-- -->
+
+-   Define candidate values: 
+
+<!-- -->
+
+-   p1 \<- c(...) 
+
+<!-- -->
+
+-   p2 \<- c(...) 
+
+<!-- -->
+
+-   p3 \<- c(...) 
+
+<!-- -->
+
+-   etc. 
+
+<!-- -->
+
+-   These represent biologically plausible alternatives, not arbitrary
+    numbers 
+
+<!-- -->
+
+-   **Respect selectivity type logic** 
+
+<!-- -->
+
+-   The script maps each sel_type to the parameters it actually uses: 
+
+<!-- -->
+
+-   Example: 
+
+<!-- -->
+
+-   Type 1 → only param1, param2 
+
+<!-- -->
+
+-   Type 4 → uses param1, param2, param3 
+
+<!-- -->
+
+-   Unused parameters remain present in the file but are ignored by the
+    model 
+
+<!-- -->
+
+-   **Automatic generation of selectivity configurations** 
+
+<!-- -->
+
+-   The script: 
+
+<!-- -->
+
+-   Builds all valid parameter combinations using expand.grid 
+
+<!-- -->
+
+-   Applies these consistently across all gears 
+
+<!-- -->
+
+-   Generates one configuration file per selectivity setup 
+
+<!-- -->
+
+-   Preserves the original file structure (only values change) 
+
+<!-- -->
+
+-   **Run the selectivity tuning** 
+
+<!-- -->
+
+-   Execute the tuning script 
+
+<!-- -->
+
+-   For each configuration, the script: 
+
+<!-- -->
+
+-   Runs ALADYM 
+
+<!-- -->
+
+-   Computes: 
+
+<!-- -->
+
+-   Global errors (SSB, Fbar, catch) 
+
+<!-- -->
+
+-   Fleet-specific errors 
+
+<!-- -->
+
+-   Saves outputs into one folder per configuration 
+
+<!-- -->
+
+-   **Generate fleet-level diagnostics** 
+
+<!-- -->
+
+-   The plotting functions automatically: 
+
+<!-- -->
+
+-   Read simulated and observed fleet catches 
+
+<!-- -->
+
+-   Produce: 
+
+<!-- -->
+
+-   One plot per gear showing all simulations vs observations 
+
+<!-- -->
+
+-   Multipanel plots grouping gears (max 9 per panel) 
+
+<!-- -->
+
+-   **Why this stage is fundamentally different** 
+
+<!-- -->
+
+-   Focus shifts from global dynamics to exploitation structure 
+
+<!-- -->
+
+-   Objective: realistic fleet- and size-based patterns 
+
+<!-- -->
+
+-   **Design of the selectivity experiment** 
+
+<!-- -->
+
+-   Which parameters are varied 
+
+<!-- -->
+
+-   Which parameters remain fixed from stage 1 
+
+<!-- -->
+
+-   Grid construction or parameter combinations 
+
+<!-- -->
+
+-   **Fleet-level visualization** 
+
+<!-- -->
+
+-   One plot per gear 
+
+<!-- -->
+
+-   All combinations vs observed time series 
+
+<!-- -->
+
+-   **Practical workflow** 
+
+<!-- -->
+
+-   Run selectivity combinations 
+
+<!-- -->
+
+-   Generate diagnostics 
+
+<!-- -->
+
+-   Shortlist promising configurations 
+
+<!-- -->
+
+-   Inspect fleet plots 
+
+<!-- -->
+
+-   Select final configuration 
