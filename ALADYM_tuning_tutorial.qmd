@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function(){
 ::: {#header-links}
 <a href="https://www.fondazionecoispa.org/" target="_blank">
 <img src="COISPA_colour.png" width="20" height="22" style="margin-right:6px; vertical-align:middle;"/>
-SEAwise Website </a>
+COISPA Website </a>
 <a href="https://github.com/COISPA" target="_blank">
 <img src="github.svg" width="20" height="22" style="margin-right:6px; vertical-align:middle;"/>
 COISPA Github </a>
