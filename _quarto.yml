@@ -1,0 +1,35 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "SEAwise – BEMTOOL tutorial"
+  search: false
+  navbar:
+    title: false
+    logo: pics/SeaWiseFinal-01.png
+    left:
+      - href: BEMTOOL_tutorialMSE.qmd
+    right:
+      - text: "SEAwise Website"
+        href: https://seawiseproject.org/
+      - text: "SEAwise Github"
+        href: https://github.com/ices-tools-dev/SEAwise
+
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    toc-expand: true
+    toc-title: "Index"
+    number-sections: false
+    df-print: paged
+    include-in-header: assets/icons.html
+    theme: default
+    smooth-scroll: true
+    css: styles-quarto.css
+
+execute:
+  warning: false
+  message: false
