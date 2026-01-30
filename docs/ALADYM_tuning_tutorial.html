@@ -170,6 +170,14 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#overview-of-the-tuning-workflow" id="toc-overview-of-the-tuning-workflow" class="nav-link" data-scroll-target="#overview-of-the-tuning-workflow">Overview of the tuning workflow</a></li>
+  <li><a href="#tr-fbar-tuning" id="toc-tr-fbar-tuning" class="nav-link" data-scroll-target="#tr-fbar-tuning">Tr-Fbar tuning</a>
+  <ul>
+  <li><a href="#input-data-requirements" id="toc-input-data-requirements" class="nav-link" data-scroll-target="#input-data-requirements">Input data requirements</a></li>
+  <li><a href="#generation-of-trfbar-combinations" id="toc-generation-of-trfbar-combinations" class="nav-link" data-scroll-target="#generation-of-trfbar-combinations">Generation of Tr–Fbar combinations</a></li>
+  <li><a href="#running-the-trfbar-tuning" id="toc-running-the-trfbar-tuning" class="nav-link" data-scroll-target="#running-the-trfbar-tuning">Running the Tr–Fbar tuning</a></li>
+  </ul></li>
+  <li><a href="#input-data-requirements-1" id="toc-input-data-requirements-1" class="nav-link" data-scroll-target="#input-data-requirements-1">Input data requirements</a></li>
   <li><a href="#step-2-selectivity-tuning-how-to-generate-and-run-combinations" id="toc-step-2-selectivity-tuning-how-to-generate-and-run-combinations" class="nav-link" data-scroll-target="#step-2-selectivity-tuning-how-to-generate-and-run-combinations"><strong>Step 2 — Selectivity tuning: how to generate and run combinations</strong></a></li>
   </ul>
 </nav>
@@ -208,7 +216,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>Compiled on 29/01/2026, 13:09</code></pre>
+<pre><code>Compiled on 30/01/2026, 17:57</code></pre>
 </div>
 </div>
 <!-- Logo in the title -->
@@ -250,11 +258,131 @@ document.addEventListener("DOMContentLoaded", function(){
 </script>
 <!-- Links -->
 <div id="header-links">
-<p><a href="https://www.fondazionecoispa.org/" target="_blank"> <img src="COISPA_colour.png" width="20" height="22" style="margin-right:6px; vertical-align:middle;"> SEAwise Website </a> <a href="https://github.com/COISPA" target="_blank"> <img src="github.svg" width="20" height="22" style="margin-right:6px; vertical-align:middle;"> COISPA Github </a></p>
+<p><a href="https://www.fondazionecoispa.org/" target="_blank"> <img src="COISPA_colour.png" width="50" height="22" style="margin-right:6px; vertical-align:middle;"> COISPA Website </a> <a href="https://github.com/COISPA" target="_blank"> <img src="github.svg" width="20" height="22" style="margin-right:6px; vertical-align:middle;"> COISPA Github </a></p>
 </div>
 <!-- start of the script -->
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
+<p>The tuning module described here is a targeted extension of BEMTOOL and operates exclusively on the ALADYM biological component. It does not modify, calibrate, or optimise any economic, effort-allocation, or management modules of BEMTOOL. Its sole purpose is to automate the calibration of selected ALADYM input parameters against external stock-assessment outputs.</p>
+<p>Specifically, the tuning workflow:</p>
+<ul>
+<li><p>runs ALADYM repeatedly using predefined configuration files,</p></li>
+<li><p>varies a controlled subset of biological parameters (e.g.&nbsp;Tr, Fbar range, and separately the selectivity parameters),</p></li>
+<li><p>evaluates model outputs against assessment-derived time series,</p></li>
+<li><p>identifies parameter combinations that minimise a predefined error metric.</p></li>
+</ul>
+<p>This procedure replaces manual, GUI-driven trial-and-error calibration with a deterministic, script-driven process that is fully reproducible and traceable.</p>
+<p>The tuning framework is designed to be used after a standard BEMTOOL/ALADYM setup is already functional. It assumes that:</p>
+<ul>
+<li><p>ALADYM runs correctly for a single configuration,</p></li>
+<li><p>input data are internally consistent,</p></li>
+<li><p>assessment outputs (SSB, Fbar, catches) are available as reference series.</p></li>
+</ul>
+<p>This tuning module is not a replacement for the standard BEMTOOL workflow. It is an upstream calibration step intended to improve the biological consistency of ALADYM before running management or bioeconomic scenarios. No knowledge of BEMTOOL’s economic or management scenario modules is required to apply the tuning, in that only ALADYM parameters are tuned.</p>
+<p>The approach is a structured grid search: no optimisation algorithm is embedded. The quality of the results depends entirely on the definition of parameter ranges and the chosen error metric. The procedure is diagnostic and comparative, not predictive.</p>
+<p>For a full description of BEMTOOL structure, data requirements, and installation, refer to the official tutorial: <a href="https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html">BEMTOOL Tutorial</a>.</p>
+<p>Installation of BEMTOOL and ALADYM must be completed following that guide before attempting any tuning procedure described here.</p>
+</section>
+<section id="overview-of-the-tuning-workflow" class="level1">
+<h1>Overview of the tuning workflow</h1>
+<p>The tuning process follows a fixed sequence:</p>
+<ol type="1">
+<li><p>Define parameter ranges to explore</p></li>
+<li><p>Generate multiple ALADYM configuration files</p></li>
+<li><p>Run ALADYM automatically for each configuration</p></li>
+<li><p>Extract simulation outputs</p></li>
+<li><p>Compare simulations to assessment data</p></li>
+<li><p>Compute a score for each parameter combination</p></li>
+<li><p>Identify and store the best-performing combination</p></li>
+<li><p>Produce diagnostic plots and summary tables</p></li>
+</ol>
+<p>The tuning procedure operates on a restricted set of ALADYM biological parameters.</p>
+<p><strong>Stage 1</strong>. In this stage the parameters that are varied are the recruitment time parameter <em>Tr</em> and the age range over which fishing mortality is averaged, Fbar.</p>
+<p><strong>Stage 2</strong>. In this stage the best Tr-Fbar combination from Stage 1 is used and the varied parameters are the selectivity parameters by fleet and gear. This stage evaluates both stock-level and fleet-level consistency.</p>
+<p>Note that the stages are executed sequentially, not jointly.</p>
+</section>
+<section id="tr-fbar-tuning" class="level1">
+<h1>Tr-Fbar tuning</h1>
+<p>The Tr–Fbar tuning explores alternative combinations of the recruitment timing parameter (Tr) and the age range used to compute mean fishing mortality (Fbar). All other biological, technical, and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.</p>
+<section id="input-data-requirements" class="level2">
+<h2 class="anchored" data-anchor-id="input-data-requirements">Input data requirements</h2>
+<p>The tuning procedure requires a fully functional baseline ALADYM configuration. This configuration must already run correctly in standalone mode before tuning is attempted.</p>
+<p>** ADD CSV EXAMPLE HERE **</p>
+<p>The baseline configuration must satisfy the following conditions:</p>
+<ul>
+<li><p>Natural mortality (M) files must start at age 0.</p></li>
+<li><p>Missing values in configuration files <strong>must be encoded as NAN</strong>, not as NA.</p></li>
+</ul>
+<p>In addition to the ALADYM configuration, the following assessment-derived time series are required:</p>
+<ul>
+<li><p>Annual Spawning Stock Biomass (SSB)</p></li>
+<li><p>Annual mean fishing mortality (Fbar), computed over a fixed reference age range</p></li>
+<li><p>Annual total catch</p></li>
+</ul>
+<p>These data are used as reference values to compute relative errors. They must be aligned by year with the ALADYM simulation outputs.</p>
+</section>
+<section id="generation-of-trfbar-combinations" class="level2">
+<h2 class="anchored" data-anchor-id="generation-of-trfbar-combinations">Generation of Tr–Fbar combinations</h2>
+<p>Tr–Fbar tuning is based on a grid search approach. The parameter space is discretised into a finite set of Tr values and Fbar age ranges, and ALADYM is run once for each possible combination.</p>
+<p>The generation of parameter combinations is handled by the script:</p>
+<p>ALADYM_tuning_main_config.R</p>
+<p>This script performs the following operations:</p>
+<ul>
+<li><p>Reads the baseline ALADYM configuration file.</p></li>
+<li><p>Defines the vectors of Tr values and Fbar age ranges to be explored.</p></li>
+<li><p>Creates all possible Tr–Fbar combinations using a Cartesian product.</p></li>
+<li><p>Writes a new ALADYM configuration file for each combination.</p></li>
+</ul>
+<p>Each generated configuration file differs from the baseline only in the Tr value and the Fbar age range. All other settings are inherited unchanged. The resulting configuration files are automatically written to:</p>
+<p>C:/INPUT/ALADYM</p>
+<p>The naming convention encodes the Tr–Fbar combination, ensuring that each run can be uniquely identified and traced back to its parameter values.</p>
+<p>** EXAMPLE OF NAMING CONVENTION **</p>
+<p>Once this script has been executed, no further manual editing of configuration files is required.</p>
+</section>
+<section id="running-the-trfbar-tuning" class="level2">
+<h2 class="anchored" data-anchor-id="running-the-trfbar-tuning">Running the Tr–Fbar tuning</h2>
+<p>After the configuration files have been generated, the tuning itself is launched using:</p>
+<p>ALADYM_tuning.R</p>
+<p>This script automatically:</p>
+<ul>
+<li><p>iterates over all Tr–Fbar configuration files,</p></li>
+<li><p>launches ALADYM in batch mode for each configuration,</p></li>
+<li><p>extracts annual SSB, Fbar, and total catch from the simulation outputs,</p></li>
+<li><p>computes relative errors with respect to assessment data,</p></li>
+<li><p>calculates a scalar score for each combination as the sum of mean squared relative errors,</p></li>
+<li><p>stores results in a cumulative calibration table.</p></li>
+</ul>
+<p>The procedure is entirely automated. No user interaction is required while the tuning is running.</p>
+<p>At the end of the process, the script identifies the Tr–Fbar combination with the lowest total score and records it as the best-performing configuration.</p>
+<p>Outputs and diagnostics</p>
+<p>For each Tr–Fbar combination, ALADYM outputs are saved in a dedicated folder named after the parameter combination. These folders contain the extracted annual time series used for calibration.</p>
+<p>In addition, the tuning script produces:</p>
+<ul>
+<li><p>a summary table of errors and scores for all combinations,</p></li>
+<li><p>diagnostic plots comparing simulations to assessment data,</p></li>
+<li><p>highlighted plots for the best-performing Tr–Fbar combination.</p></li>
+</ul>
+<p>These outputs allow both quantitative comparison and visual inspection of model behaviour across the explored parameter space.</p>
+<p>This concludes the Tr–Fbar tuning stage. Subsequent tuning steps, such as selectivity calibration, build directly on the optimal Tr–Fbar configuration identified here.</p>
+</section>
+</section>
+<section id="input-data-requirements-1" class="level1">
+<h1>Input data requirements</h1>
+<p>The tuning scripts require the following inputs:</p>
+<ul>
+<li><p>A valid ALADYM configuration file (baseline)</p></li>
+<li><p>Assessment-derived time series:</p></li>
+<li><p>Spawning Stock Biomass (SSB)</p></li>
+</ul>
+<p>ù Mean fishing mortality (Fbar)</p>
+<ul>
+<li>Total catch</li>
+</ul>
+<p>Fleet-specific catches (for selectivity tuning)</p>
+<p>Biological inputs consistent with ALADYM conventions:</p>
+<p>Natural mortality starting at age 0</p>
+<p>No NA values (use NAN instead)</p>
+<p>All assessment data must cover the same year range used in ALADYM.</p>
 <p><strong>r / Fbar tuning: how to generate and run combinations</strong></p>
 <ul>
 <li><strong>Define the parameter ranges</strong>&nbsp;</li>
