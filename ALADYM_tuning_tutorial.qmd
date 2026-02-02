@@ -239,7 +239,7 @@ The tuning scripts require the following inputs:
 
 + Spawning Stock Biomass (SSB)
 
-ù Mean fishing mortality (Fbar)
+Mean fishing mortality (Fbar)
 
 + Total catch
 
@@ -698,3 +698,6 @@ C:/INPUT/ALADYM/ 
 <!-- -->
 
 -   Select final configuration 
+
+<!-- -->
+- check other requirements
