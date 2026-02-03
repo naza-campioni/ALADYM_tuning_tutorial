@@ -102,8 +102,11 @@ For a full description of BEMTOOL structure, data requirements, and installation
 
 Installation of BEMTOOL and ALADYM must be completed following that guide before attempting any tuning procedure described here.
 
+# How to install ALADYM tuning
 
 # Overview of the tuning workflow
+
+** ADD OVERVIEW, EXPLANATORY PICTURE **
 
 The tuning process follows a fixed sequence:
 
@@ -125,7 +128,7 @@ The tuning process follows a fixed sequence:
 
 The tuning procedure operates on a restricted set of ALADYM biological parameters.
 
-**Stage 1**. In this stage the parameters that are varied are the recruitment time parameter _Tr_ and the age range over which fishing mortality is averaged, Fbar.
+**Stage 1**. In this stage the parameters that are varied are the recruitment time parameter _Tr_ and the age range over which fishing mortality is averaged, _Fbar_.
 
 **Stage 2**. In this stage the best Tr-Fbar combination from Stage 1 is used and the varied parameters are the selectivity parameters by fleet and gear. This stage evaluates both stock-level and fleet-level consistency.
 
@@ -133,29 +136,26 @@ Note that the stages are executed sequentially, not jointly.
 
 # Tr-Fbar tuning
 
-The Tr–Fbar tuning explores alternative combinations of the recruitment timing parameter (Tr) and the age range used to compute mean fishing mortality (Fbar). All other biological, technical, and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.
+The Tr–Fbar tuning explores alternative combinations of the recruitment timing parameter Tr and the age range used to compute mean fishing mortality Fbar. All other biological and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.
 
 ## Input data requirements
 
-The tuning procedure requires a fully functional baseline ALADYM configuration. This configuration must already run correctly in standalone mode before tuning is attempted.
+After installation of the ALADYM tuning software, a baseline ALADYM configuration must be prepared. This baseline configuration is the structural reference from which all tuning combinations are generated. Every Tr–Fbar or selectivity configuration produced by the tuning scripts is a direct modification of this baseline. 
 
- ** ADD CSV EXAMPLE HERE **
 
-The baseline configuration must satisfy the following conditions:
+Several constraints are critical.
 
-- Natural mortality (M) files must start at age 0.
+Natural mortality (M) files must start at age 0. Any offset in age indexing will cause silent misalignment between biological processes and assessment data, invalidating error calculations.
 
-- Missing values in configuration files **must be encoded as NAN**, not as NA.
+Missing values in all configuration files **must be encoded as NAN**, not NA. ALADYM is not NA-aware. Using NA leads to type coercion, failed reads, or numerical propagation of missing values - NAN is explicitly handled by the model and by the tuning scripts.
 
-In addition to the ALADYM configuration, the following assessment-derived time series are required:
+The ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided here:
 
-- Annual Spawning Stock Biomass (SSB)
+**ADD CSV EXAMPLE HERE**
+(example of a correctly formatted ALADYM input file, not a BEMTOOL file)
+**LINK TO TEMPLATE CONFIGURATION – TO BE ADDED**
 
-- Annual mean fishing mortality (Fbar), computed over a fixed reference age range
-
-- Annual total catch
-
-These data are used as reference values to compute relative errors. They must be aligned by year with the ALADYM simulation outputs.
+Finally, the simulation period defined in the configuration must match exactly the years available in the assessment time series used for calibration. No extrapolation or truncation is performed automatically.
 
 ## Generation of Tr–Fbar combinations
 
@@ -163,7 +163,7 @@ Tr–Fbar tuning is based on a grid search approach. The parameter space is disc
 
 The generation of parameter combinations is handled by the script:
 
-ALADYM_tuning_main_config.R
+`ALADYM_tuning_main_config.R`
 
 
 This script performs the following operations:
@@ -178,8 +178,7 @@ This script performs the following operations:
 
 Each generated configuration file differs from the baseline only in the Tr value and the Fbar age range. All other settings are inherited unchanged. The resulting configuration files are automatically written to:
 
-C:/INPUT/ALADYM
-
+`C:/INPUT/ALADYM`
 
 The naming convention encodes the Tr–Fbar combination, ensuring that each run can be uniquely identified and traced back to its parameter values.
 
@@ -191,7 +190,7 @@ Once this script has been executed, no further manual editing of configuration f
 
 After the configuration files have been generated, the tuning itself is launched using:
 
-ALADYM_tuning.R
+`ALADYM_tuning.R`
 
 
 This script automatically:
@@ -212,9 +211,12 @@ The procedure is entirely automated. No user interaction is required while the t
 
 At the end of the process, the script identifies the Tr–Fbar combination with the lowest total score and records it as the best-performing configuration.
 
-Outputs and diagnostics
+## Outputs and diagnostics
 
 For each Tr–Fbar combination, ALADYM outputs are saved in a dedicated folder named after the parameter combination. These folders contain the extracted annual time series used for calibration.
+
+** ADD EXAMPLE FOLDER NAME **
+
 
 In addition, the tuning script produces:
 
@@ -227,6 +229,78 @@ In addition, the tuning script produces:
 These outputs allow both quantitative comparison and visual inspection of model behaviour across the explored parameter space.
 
 This concludes the Tr–Fbar tuning stage. Subsequent tuning steps, such as selectivity calibration, build directly on the optimal Tr–Fbar configuration identified here.
+
+
+# Selectivity tuning
+
+Selectivity tuning is performed only after the Tr–Fbar tuning stage has converged. The optimal Tr–Fbar combination is treated as fixed input. Selectivity tuning explores alternative gear-specific selectivity parameterisations while holding recruitment timing, fishing mortality structure, and all biological parameters constant.
+
+This is a controlled second-stage calibration. The objective is to improve fleet-specific catch dynamics without destabilising stock-level indicators.
+
+## Input data requirements 
+
+Selectivity is defined at the fleet-segment level. Each fleet is associated with:
+
+- a selectivity type identifier,
+
+- a fixed number of parameter slots (six in the input file),
+
+- a subset of those parameters actually used, depending on the selectivity type.
+
+The selectivity input file is rectangular by design: all fleets share the same column structure, even if some parameters are unused. Unused parameters must still be present and must be left empty.
+
+## Definition of parameter ranges
+
+Selectivity tuning is driven by user-defined parameter ranges. For each parameter involved in a given selectivity type, a discrete set of candidate values is specified.
+
+These ranges are defined in R as simple numeric vectors. The tuning scripts do not assume continuity or bounds; they only enumerate combinations.
+
+Only parameters that are active for a given selectivity type are included in the combination space. The remaining parameter slots are left unchanged from the baseline configuration.
+
+## Generation of selectivity configurations
+
+Configuration generation is handled by the selectivity tuning scripts. Internally, the process follows three steps:
+
+1. The selectivity file is split by fleet segment.
+
+2. For each fleet, all valid parameter combinations are generated using a Cartesian product over the active parameters.
+
+3. Full-model configurations are created by combining fleet-level parameter choices across fleets.
+
+The result is a set of complete ALADYM configurations, each corresponding to one unique multi-fleet selectivity setup. Each configuration modifies only the selectivity file; all other inputs remain identical to the optimal Tr–Fbar baseline.
+
+Configuration folders are named systematically to encode the selectivity parameter combination. This naming is later used to aggregate results and compute scores.
+
+## Running selectivity tuning
+
+Once configuration files are generated, the selectivity tuning run is launched in batch mode. For each configuration, ALADYM is executed and the following outputs are extracted:
+
+- stock-level indicators (SSB, Fbar, total catch),
+
+- fleet-specific annual catches.
+
+Relative errors are computed both at the stock level and at the fleet level. Fleet errors are retained explicitly rather than collapsed immediately, allowing inspection of trade-offs between fleets.
+
+A global score is computed by combining stock-level errors with fleet-level error summaries. The weighting scheme is transparent and can be modified if required.
+
+## Outputs and diagnostics
+
+Selectivity tuning produces:
+
+- a comprehensive error table with one row per configuration,
+
+- fleet-specific error metrics,
+
+- diagnostic plots showing simulated versus observed catches for each fleet,
+
+- aggregated plots showing all selectivity simulations against observations.
+
+The best-performing configuration is identified based on the defined score criterion, but alternative near-optimal solutions can be inspected to evaluate robustness and fleet trade-offs.
+
+
+
+
+
 
 
 # Input data requirements

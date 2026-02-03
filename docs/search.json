@@ -4,14 +4,14 @@
     "href": "ALADYM_tuning_tutorial.html",
     "title": "ALADYM_tuning_tutorial",
     "section": "",
-    "text": "Compiled on 02/02/2026, 16:30"
+    "text": "Compiled on 03/02/2026, 14:10"
   },
   {
     "objectID": "ALADYM_tuning_tutorial.html#input-data-requirements",
     "href": "ALADYM_tuning_tutorial.html#input-data-requirements",
     "title": "ALADYM_tuning_tutorial",
     "section": "Input data requirements",
-    "text": "Input data requirements\nThe tuning procedure requires a fully functional baseline ALADYM configuration. This configuration must already run correctly in standalone mode before tuning is attempted.\n** ADD CSV EXAMPLE HERE **\nThe baseline configuration must satisfy the following conditions:\n\nNatural mortality (M) files must start at age 0.\nMissing values in configuration files must be encoded as NAN, not as NA.\n\nIn addition to the ALADYM configuration, the following assessment-derived time series are required:\n\nAnnual Spawning Stock Biomass (SSB)\nAnnual mean fishing mortality (Fbar), computed over a fixed reference age range\nAnnual total catch\n\nThese data are used as reference values to compute relative errors. They must be aligned by year with the ALADYM simulation outputs."
+    "text": "Input data requirements\nAfter installation of the ALADYM tuning software, a baseline ALADYM configuration must be prepared. This baseline configuration is the structural reference from which all tuning combinations are generated. Every Tr–Fbar or selectivity configuration produced by the tuning scripts is a direct modification of this baseline.\nSeveral constraints are critical.\nNatural mortality (M) files must start at age 0. Any offset in age indexing will cause silent misalignment between biological processes and assessment data, invalidating error calculations.\nMissing values in all configuration files must be encoded as NAN, not NA. ALADYM is not NA-aware. Using NA leads to type coercion, failed reads, or numerical propagation of missing values - NAN is explicitly handled by the model and by the tuning scripts.\nThe ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided here:\nADD CSV EXAMPLE HERE (example of a correctly formatted ALADYM input file, not a BEMTOOL file) LINK TO TEMPLATE CONFIGURATION – TO BE ADDED\nFinally, the simulation period defined in the configuration must match exactly the years available in the assessment time series used for calibration. No extrapolation or truncation is performed automatically."
   },
   {
     "objectID": "ALADYM_tuning_tutorial.html#generation-of-trfbar-combinations",
@@ -25,6 +25,48 @@
     "href": "ALADYM_tuning_tutorial.html#running-the-trfbar-tuning",
     "title": "ALADYM_tuning_tutorial",
     "section": "Running the Tr–Fbar tuning",
-    "text": "Running the Tr–Fbar tuning\nAfter the configuration files have been generated, the tuning itself is launched using:\nALADYM_tuning.R\nThis script automatically:\n\niterates over all Tr–Fbar configuration files,\nlaunches ALADYM in batch mode for each configuration,\nextracts annual SSB, Fbar, and total catch from the simulation outputs,\ncomputes relative errors with respect to assessment data,\ncalculates a scalar score for each combination as the sum of mean squared relative errors,\nstores results in a cumulative calibration table.\n\nThe procedure is entirely automated. No user interaction is required while the tuning is running.\nAt the end of the process, the script identifies the Tr–Fbar combination with the lowest total score and records it as the best-performing configuration.\nOutputs and diagnostics\nFor each Tr–Fbar combination, ALADYM outputs are saved in a dedicated folder named after the parameter combination. These folders contain the extracted annual time series used for calibration.\nIn addition, the tuning script produces:\n\na summary table of errors and scores for all combinations,\ndiagnostic plots comparing simulations to assessment data,\nhighlighted plots for the best-performing Tr–Fbar combination.\n\nThese outputs allow both quantitative comparison and visual inspection of model behaviour across the explored parameter space.\nThis concludes the Tr–Fbar tuning stage. Subsequent tuning steps, such as selectivity calibration, build directly on the optimal Tr–Fbar configuration identified here."
+    "text": "Running the Tr–Fbar tuning\nAfter the configuration files have been generated, the tuning itself is launched using:\nALADYM_tuning.R\nThis script automatically:\n\niterates over all Tr–Fbar configuration files,\nlaunches ALADYM in batch mode for each configuration,\nextracts annual SSB, Fbar, and total catch from the simulation outputs,\ncomputes relative errors with respect to assessment data,\ncalculates a scalar score for each combination as the sum of mean squared relative errors,\nstores results in a cumulative calibration table.\n\nThe procedure is entirely automated. No user interaction is required while the tuning is running.\nAt the end of the process, the script identifies the Tr–Fbar combination with the lowest total score and records it as the best-performing configuration."
+  },
+  {
+    "objectID": "ALADYM_tuning_tutorial.html#outputs-and-diagnostics",
+    "href": "ALADYM_tuning_tutorial.html#outputs-and-diagnostics",
+    "title": "ALADYM_tuning_tutorial",
+    "section": "Outputs and diagnostics",
+    "text": "Outputs and diagnostics\nFor each Tr–Fbar combination, ALADYM outputs are saved in a dedicated folder named after the parameter combination. These folders contain the extracted annual time series used for calibration.\n** ADD EXAMPLE FOLDER NAME **\nIn addition, the tuning script produces:\n\na summary table of errors and scores for all combinations,\ndiagnostic plots comparing simulations to assessment data,\nhighlighted plots for the best-performing Tr–Fbar combination.\n\nThese outputs allow both quantitative comparison and visual inspection of model behaviour across the explored parameter space.\nThis concludes the Tr–Fbar tuning stage. Subsequent tuning steps, such as selectivity calibration, build directly on the optimal Tr–Fbar configuration identified here."
+  },
+  {
+    "objectID": "ALADYM_tuning_tutorial.html#input-data-requirements-1",
+    "href": "ALADYM_tuning_tutorial.html#input-data-requirements-1",
+    "title": "ALADYM_tuning_tutorial",
+    "section": "Input data requirements",
+    "text": "Input data requirements\nSelectivity is defined at the fleet-segment level. Each fleet is associated with:\n\na selectivity type identifier,\na fixed number of parameter slots (six in the input file),\na subset of those parameters actually used, depending on the selectivity type.\n\nThe selectivity input file is rectangular by design: all fleets share the same column structure, even if some parameters are unused. Unused parameters must still be present and must be left empty."
+  },
+  {
+    "objectID": "ALADYM_tuning_tutorial.html#definition-of-parameter-ranges",
+    "href": "ALADYM_tuning_tutorial.html#definition-of-parameter-ranges",
+    "title": "ALADYM_tuning_tutorial",
+    "section": "Definition of parameter ranges",
+    "text": "Definition of parameter ranges\nSelectivity tuning is driven by user-defined parameter ranges. For each parameter involved in a given selectivity type, a discrete set of candidate values is specified.\nThese ranges are defined in R as simple numeric vectors. The tuning scripts do not assume continuity or bounds; they only enumerate combinations.\nOnly parameters that are active for a given selectivity type are included in the combination space. The remaining parameter slots are left unchanged from the baseline configuration."
+  },
+  {
+    "objectID": "ALADYM_tuning_tutorial.html#generation-of-selectivity-configurations",
+    "href": "ALADYM_tuning_tutorial.html#generation-of-selectivity-configurations",
+    "title": "ALADYM_tuning_tutorial",
+    "section": "Generation of selectivity configurations",
+    "text": "Generation of selectivity configurations\nConfiguration generation is handled by the selectivity tuning scripts. Internally, the process follows three steps:\n\nThe selectivity file is split by fleet segment.\nFor each fleet, all valid parameter combinations are generated using a Cartesian product over the active parameters.\nFull-model configurations are created by combining fleet-level parameter choices across fleets.\n\nThe result is a set of complete ALADYM configurations, each corresponding to one unique multi-fleet selectivity setup. Each configuration modifies only the selectivity file; all other inputs remain identical to the optimal Tr–Fbar baseline.\nConfiguration folders are named systematically to encode the selectivity parameter combination. This naming is later used to aggregate results and compute scores."
+  },
+  {
+    "objectID": "ALADYM_tuning_tutorial.html#running-selectivity-tuning",
+    "href": "ALADYM_tuning_tutorial.html#running-selectivity-tuning",
+    "title": "ALADYM_tuning_tutorial",
+    "section": "Running selectivity tuning",
+    "text": "Running selectivity tuning\nOnce configuration files are generated, the selectivity tuning run is launched in batch mode. For each configuration, ALADYM is executed and the following outputs are extracted:\n\nstock-level indicators (SSB, Fbar, total catch),\nfleet-specific annual catches.\n\nRelative errors are computed both at the stock level and at the fleet level. Fleet errors are retained explicitly rather than collapsed immediately, allowing inspection of trade-offs between fleets.\nA global score is computed by combining stock-level errors with fleet-level error summaries. The weighting scheme is transparent and can be modified if required."
+  },
+  {
+    "objectID": "ALADYM_tuning_tutorial.html#outputs-and-diagnostics-1",
+    "href": "ALADYM_tuning_tutorial.html#outputs-and-diagnostics-1",
+    "title": "ALADYM_tuning_tutorial",
+    "section": "Outputs and diagnostics",
+    "text": "Outputs and diagnostics\nSelectivity tuning produces:\n\na comprehensive error table with one row per configuration,\nfleet-specific error metrics,\ndiagnostic plots showing simulated versus observed catches for each fleet,\naggregated plots showing all selectivity simulations against observations.\n\nThe best-performing configuration is identified based on the defined score criterion, but alternative near-optimal solutions can be inspected to evaluate robustness and fleet trade-offs."
   }
 ]

@@ -170,14 +170,24 @@ ul.task-list li input[type="checkbox"] {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#how-to-install-aladym-tuning" id="toc-how-to-install-aladym-tuning" class="nav-link" data-scroll-target="#how-to-install-aladym-tuning">How to install ALADYM tuning</a></li>
   <li><a href="#overview-of-the-tuning-workflow" id="toc-overview-of-the-tuning-workflow" class="nav-link" data-scroll-target="#overview-of-the-tuning-workflow">Overview of the tuning workflow</a></li>
   <li><a href="#tr-fbar-tuning" id="toc-tr-fbar-tuning" class="nav-link" data-scroll-target="#tr-fbar-tuning">Tr-Fbar tuning</a>
   <ul>
   <li><a href="#input-data-requirements" id="toc-input-data-requirements" class="nav-link" data-scroll-target="#input-data-requirements">Input data requirements</a></li>
   <li><a href="#generation-of-trfbar-combinations" id="toc-generation-of-trfbar-combinations" class="nav-link" data-scroll-target="#generation-of-trfbar-combinations">Generation of Tr–Fbar combinations</a></li>
   <li><a href="#running-the-trfbar-tuning" id="toc-running-the-trfbar-tuning" class="nav-link" data-scroll-target="#running-the-trfbar-tuning">Running the Tr–Fbar tuning</a></li>
+  <li><a href="#outputs-and-diagnostics" id="toc-outputs-and-diagnostics" class="nav-link" data-scroll-target="#outputs-and-diagnostics">Outputs and diagnostics</a></li>
   </ul></li>
+  <li><a href="#selectivity-tuning" id="toc-selectivity-tuning" class="nav-link" data-scroll-target="#selectivity-tuning">Selectivity tuning</a>
+  <ul>
   <li><a href="#input-data-requirements-1" id="toc-input-data-requirements-1" class="nav-link" data-scroll-target="#input-data-requirements-1">Input data requirements</a></li>
+  <li><a href="#definition-of-parameter-ranges" id="toc-definition-of-parameter-ranges" class="nav-link" data-scroll-target="#definition-of-parameter-ranges">Definition of parameter ranges</a></li>
+  <li><a href="#generation-of-selectivity-configurations" id="toc-generation-of-selectivity-configurations" class="nav-link" data-scroll-target="#generation-of-selectivity-configurations">Generation of selectivity configurations</a></li>
+  <li><a href="#running-selectivity-tuning" id="toc-running-selectivity-tuning" class="nav-link" data-scroll-target="#running-selectivity-tuning">Running selectivity tuning</a></li>
+  <li><a href="#outputs-and-diagnostics-1" id="toc-outputs-and-diagnostics-1" class="nav-link" data-scroll-target="#outputs-and-diagnostics-1">Outputs and diagnostics</a></li>
+  </ul></li>
+  <li><a href="#input-data-requirements-2" id="toc-input-data-requirements-2" class="nav-link" data-scroll-target="#input-data-requirements-2">Input data requirements</a></li>
   <li><a href="#step-2-selectivity-tuning-how-to-generate-and-run-combinations" id="toc-step-2-selectivity-tuning-how-to-generate-and-run-combinations" class="nav-link" data-scroll-target="#step-2-selectivity-tuning-how-to-generate-and-run-combinations"><strong>Step 2 — Selectivity tuning: how to generate and run combinations</strong></a></li>
   </ul>
 </nav>
@@ -216,7 +226,7 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>Compiled on 02/02/2026, 16:30</code></pre>
+<pre><code>Compiled on 03/02/2026, 14:10</code></pre>
 </div>
 </div>
 <!-- Logo in the title -->
@@ -283,8 +293,12 @@ document.addEventListener("DOMContentLoaded", function(){
 <p>For a full description of BEMTOOL structure, data requirements, and installation, refer to the official tutorial: <a href="https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html">BEMTOOL Tutorial</a>.</p>
 <p>Installation of BEMTOOL and ALADYM must be completed following that guide before attempting any tuning procedure described here.</p>
 </section>
+<section id="how-to-install-aladym-tuning" class="level1">
+<h1>How to install ALADYM tuning</h1>
+</section>
 <section id="overview-of-the-tuning-workflow" class="level1">
 <h1>Overview of the tuning workflow</h1>
+<p>** ADD OVERVIEW, EXPLANATORY PICTURE **</p>
 <p>The tuning process follows a fixed sequence:</p>
 <ol type="1">
 <li><p>Define parameter ranges to explore</p></li>
@@ -297,35 +311,28 @@ document.addEventListener("DOMContentLoaded", function(){
 <li><p>Produce diagnostic plots and summary tables</p></li>
 </ol>
 <p>The tuning procedure operates on a restricted set of ALADYM biological parameters.</p>
-<p><strong>Stage 1</strong>. In this stage the parameters that are varied are the recruitment time parameter <em>Tr</em> and the age range over which fishing mortality is averaged, Fbar.</p>
+<p><strong>Stage 1</strong>. In this stage the parameters that are varied are the recruitment time parameter <em>Tr</em> and the age range over which fishing mortality is averaged, <em>Fbar</em>.</p>
 <p><strong>Stage 2</strong>. In this stage the best Tr-Fbar combination from Stage 1 is used and the varied parameters are the selectivity parameters by fleet and gear. This stage evaluates both stock-level and fleet-level consistency.</p>
 <p>Note that the stages are executed sequentially, not jointly.</p>
 </section>
 <section id="tr-fbar-tuning" class="level1">
 <h1>Tr-Fbar tuning</h1>
-<p>The Tr–Fbar tuning explores alternative combinations of the recruitment timing parameter (Tr) and the age range used to compute mean fishing mortality (Fbar). All other biological, technical, and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.</p>
+<p>The Tr–Fbar tuning explores alternative combinations of the recruitment timing parameter Tr and the age range used to compute mean fishing mortality Fbar. All other biological and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.</p>
 <section id="input-data-requirements" class="level2">
 <h2 class="anchored" data-anchor-id="input-data-requirements">Input data requirements</h2>
-<p>The tuning procedure requires a fully functional baseline ALADYM configuration. This configuration must already run correctly in standalone mode before tuning is attempted.</p>
-<p>** ADD CSV EXAMPLE HERE **</p>
-<p>The baseline configuration must satisfy the following conditions:</p>
-<ul>
-<li><p>Natural mortality (M) files must start at age 0.</p></li>
-<li><p>Missing values in configuration files <strong>must be encoded as NAN</strong>, not as NA.</p></li>
-</ul>
-<p>In addition to the ALADYM configuration, the following assessment-derived time series are required:</p>
-<ul>
-<li><p>Annual Spawning Stock Biomass (SSB)</p></li>
-<li><p>Annual mean fishing mortality (Fbar), computed over a fixed reference age range</p></li>
-<li><p>Annual total catch</p></li>
-</ul>
-<p>These data are used as reference values to compute relative errors. They must be aligned by year with the ALADYM simulation outputs.</p>
+<p>After installation of the ALADYM tuning software, a baseline ALADYM configuration must be prepared. This baseline configuration is the structural reference from which all tuning combinations are generated. Every Tr–Fbar or selectivity configuration produced by the tuning scripts is a direct modification of this baseline.</p>
+<p>Several constraints are critical.</p>
+<p>Natural mortality (M) files must start at age 0. Any offset in age indexing will cause silent misalignment between biological processes and assessment data, invalidating error calculations.</p>
+<p>Missing values in all configuration files <strong>must be encoded as NAN</strong>, not NA. ALADYM is not NA-aware. Using NA leads to type coercion, failed reads, or numerical propagation of missing values - NAN is explicitly handled by the model and by the tuning scripts.</p>
+<p>The ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided here:</p>
+<p><strong>ADD CSV EXAMPLE HERE</strong> (example of a correctly formatted ALADYM input file, not a BEMTOOL file) <strong>LINK TO TEMPLATE CONFIGURATION – TO BE ADDED</strong></p>
+<p>Finally, the simulation period defined in the configuration must match exactly the years available in the assessment time series used for calibration. No extrapolation or truncation is performed automatically.</p>
 </section>
 <section id="generation-of-trfbar-combinations" class="level2">
 <h2 class="anchored" data-anchor-id="generation-of-trfbar-combinations">Generation of Tr–Fbar combinations</h2>
 <p>Tr–Fbar tuning is based on a grid search approach. The parameter space is discretised into a finite set of Tr values and Fbar age ranges, and ALADYM is run once for each possible combination.</p>
 <p>The generation of parameter combinations is handled by the script:</p>
-<p>ALADYM_tuning_main_config.R</p>
+<p><code>ALADYM_tuning_main_config.R</code></p>
 <p>This script performs the following operations:</p>
 <ul>
 <li><p>Reads the baseline ALADYM configuration file.</p></li>
@@ -334,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <li><p>Writes a new ALADYM configuration file for each combination.</p></li>
 </ul>
 <p>Each generated configuration file differs from the baseline only in the Tr value and the Fbar age range. All other settings are inherited unchanged. The resulting configuration files are automatically written to:</p>
-<p>C:/INPUT/ALADYM</p>
+<p><code>C:/INPUT/ALADYM</code></p>
 <p>The naming convention encodes the Tr–Fbar combination, ensuring that each run can be uniquely identified and traced back to its parameter values.</p>
 <p>** EXAMPLE OF NAMING CONVENTION **</p>
 <p>Once this script has been executed, no further manual editing of configuration files is required.</p>
@@ -342,7 +349,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <section id="running-the-trfbar-tuning" class="level2">
 <h2 class="anchored" data-anchor-id="running-the-trfbar-tuning">Running the Tr–Fbar tuning</h2>
 <p>After the configuration files have been generated, the tuning itself is launched using:</p>
-<p>ALADYM_tuning.R</p>
+<p><code>ALADYM_tuning.R</code></p>
 <p>This script automatically:</p>
 <ul>
 <li><p>iterates over all Tr–Fbar configuration files,</p></li>
@@ -354,8 +361,11 @@ document.addEventListener("DOMContentLoaded", function(){
 </ul>
 <p>The procedure is entirely automated. No user interaction is required while the tuning is running.</p>
 <p>At the end of the process, the script identifies the Tr–Fbar combination with the lowest total score and records it as the best-performing configuration.</p>
-<p>Outputs and diagnostics</p>
+</section>
+<section id="outputs-and-diagnostics" class="level2">
+<h2 class="anchored" data-anchor-id="outputs-and-diagnostics">Outputs and diagnostics</h2>
 <p>For each Tr–Fbar combination, ALADYM outputs are saved in a dedicated folder named after the parameter combination. These folders contain the extracted annual time series used for calibration.</p>
+<p>** ADD EXAMPLE FOLDER NAME **</p>
 <p>In addition, the tuning script produces:</p>
 <ul>
 <li><p>a summary table of errors and scores for all combinations,</p></li>
@@ -366,7 +376,60 @@ document.addEventListener("DOMContentLoaded", function(){
 <p>This concludes the Tr–Fbar tuning stage. Subsequent tuning steps, such as selectivity calibration, build directly on the optimal Tr–Fbar configuration identified here.</p>
 </section>
 </section>
-<section id="input-data-requirements-1" class="level1">
+<section id="selectivity-tuning" class="level1">
+<h1>Selectivity tuning</h1>
+<p>Selectivity tuning is performed only after the Tr–Fbar tuning stage has converged. The optimal Tr–Fbar combination is treated as fixed input. Selectivity tuning explores alternative gear-specific selectivity parameterisations while holding recruitment timing, fishing mortality structure, and all biological parameters constant.</p>
+<p>This is a controlled second-stage calibration. The objective is to improve fleet-specific catch dynamics without destabilising stock-level indicators.</p>
+<section id="input-data-requirements-1" class="level2">
+<h2 class="anchored" data-anchor-id="input-data-requirements-1">Input data requirements</h2>
+<p>Selectivity is defined at the fleet-segment level. Each fleet is associated with:</p>
+<ul>
+<li><p>a selectivity type identifier,</p></li>
+<li><p>a fixed number of parameter slots (six in the input file),</p></li>
+<li><p>a subset of those parameters actually used, depending on the selectivity type.</p></li>
+</ul>
+<p>The selectivity input file is rectangular by design: all fleets share the same column structure, even if some parameters are unused. Unused parameters must still be present and must be left empty.</p>
+</section>
+<section id="definition-of-parameter-ranges" class="level2">
+<h2 class="anchored" data-anchor-id="definition-of-parameter-ranges">Definition of parameter ranges</h2>
+<p>Selectivity tuning is driven by user-defined parameter ranges. For each parameter involved in a given selectivity type, a discrete set of candidate values is specified.</p>
+<p>These ranges are defined in R as simple numeric vectors. The tuning scripts do not assume continuity or bounds; they only enumerate combinations.</p>
+<p>Only parameters that are active for a given selectivity type are included in the combination space. The remaining parameter slots are left unchanged from the baseline configuration.</p>
+</section>
+<section id="generation-of-selectivity-configurations" class="level2">
+<h2 class="anchored" data-anchor-id="generation-of-selectivity-configurations">Generation of selectivity configurations</h2>
+<p>Configuration generation is handled by the selectivity tuning scripts. Internally, the process follows three steps:</p>
+<ol type="1">
+<li><p>The selectivity file is split by fleet segment.</p></li>
+<li><p>For each fleet, all valid parameter combinations are generated using a Cartesian product over the active parameters.</p></li>
+<li><p>Full-model configurations are created by combining fleet-level parameter choices across fleets.</p></li>
+</ol>
+<p>The result is a set of complete ALADYM configurations, each corresponding to one unique multi-fleet selectivity setup. Each configuration modifies only the selectivity file; all other inputs remain identical to the optimal Tr–Fbar baseline.</p>
+<p>Configuration folders are named systematically to encode the selectivity parameter combination. This naming is later used to aggregate results and compute scores.</p>
+</section>
+<section id="running-selectivity-tuning" class="level2">
+<h2 class="anchored" data-anchor-id="running-selectivity-tuning">Running selectivity tuning</h2>
+<p>Once configuration files are generated, the selectivity tuning run is launched in batch mode. For each configuration, ALADYM is executed and the following outputs are extracted:</p>
+<ul>
+<li><p>stock-level indicators (SSB, Fbar, total catch),</p></li>
+<li><p>fleet-specific annual catches.</p></li>
+</ul>
+<p>Relative errors are computed both at the stock level and at the fleet level. Fleet errors are retained explicitly rather than collapsed immediately, allowing inspection of trade-offs between fleets.</p>
+<p>A global score is computed by combining stock-level errors with fleet-level error summaries. The weighting scheme is transparent and can be modified if required.</p>
+</section>
+<section id="outputs-and-diagnostics-1" class="level2">
+<h2 class="anchored" data-anchor-id="outputs-and-diagnostics-1">Outputs and diagnostics</h2>
+<p>Selectivity tuning produces:</p>
+<ul>
+<li><p>a comprehensive error table with one row per configuration,</p></li>
+<li><p>fleet-specific error metrics,</p></li>
+<li><p>diagnostic plots showing simulated versus observed catches for each fleet,</p></li>
+<li><p>aggregated plots showing all selectivity simulations against observations.</p></li>
+</ul>
+<p>The best-performing configuration is identified based on the defined score criterion, but alternative near-optimal solutions can be inspected to evaluate robustness and fleet trade-offs.</p>
+</section>
+</section>
+<section id="input-data-requirements-2" class="level1">
 <h1>Input data requirements</h1>
 <p>The tuning scripts require the following inputs:</p>
 <ul>
