@@ -7,9 +7,9 @@ editor:
     wrap: 72
 ---
 
-```{r, echo=FALSE}
-cat(sprintf("Compiled on %s\n\n", format(Sys.time(), '%d/%m/%Y, %H:%M')))
-```
+<!-- ```{r, echo=FALSE} -->
+<!--  cat(sprintf("Compiled on %s\n\n", format(Sys.time(), '%d/%m/%Y, %H:%M'))) -->
+<!--  ``` -->
 
 <!-- Logo in the title -->
 
@@ -70,6 +70,7 @@ COISPA Github </a>
 <!-- start of the script -->
 
 # Introduction
+
 The tuning module described here is a targeted extension of BEMTOOL and operates exclusively on the ALADYM biological component. It does not modify, calibrate, or optimise any economic, effort-allocation, or management modules of BEMTOOL. Its sole purpose is to automate the calibration of selected ALADYM input parameters against external stock-assessment outputs.
 
 Specifically, the tuning workflow:
@@ -93,44 +94,44 @@ The tuning framework is designed to be used after a standard BEMTOOL/ALADYM setu
 - assessment outputs (SSB, Fbar, catches) are available as reference series.
 
 
-
 This tuning module is not a replacement for the standard BEMTOOL workflow. It is an upstream calibration step intended to improve the biological consistency of ALADYM before running management or bioeconomic scenarios. No knowledge of BEMTOOL’s economic or management scenario modules is required to apply the tuning, in that only ALADYM parameters are tuned.
 
-The approach is a structured grid search: no optimisation algorithm is embedded. The quality of the results depends entirely on the definition of parameter ranges and the chosen error metric. The procedure is diagnostic and comparative, not predictive.
+The approach is a structured grid search: no optimisation algorithm is employed. The procedure is diagnostic and comparative, not predictive.
 
 For a full description of BEMTOOL structure, data requirements, and installation, refer to the official tutorial: [BEMTOOL Tutorial](https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html).
 
-Installation of BEMTOOL and ALADYM must be completed following that guide before attempting any tuning procedure described here.
+Installation of BEMTOOL and ALADYM must be completed following that guide before attempting any tuning procedure described below.
 
 # How to install ALADYM tuning
 
 # Overview of the tuning workflow
 
-** ADD OVERVIEW, EXPLANATORY PICTURE **
+The tuning process follows a fixed and sequential workflow designed to ensure consistency and reproducibility across all simulations. First, the user defines the ranges of the parameters to be explored, specifying the discrete values that will be tested during calibration. Based on these ranges, the tuning scripts automatically generate multiple ALADYM configuration files, each representing a unique parameter combination derived from the baseline setup.
 
-The tuning process follows a fixed sequence:
+ALADYM is then executed in batch mode for every generated configuration, with no manual intervention required during the simulation phase. Once all runs are completed, the relevant simulation outputs are systematically extracted and aligned with the corresponding assessment data. These simulated results are compared against observations to quantify discrepancies across time and indicators.
 
-1. Define parameter ranges to explore
+For each parameter combination, a numerical score is computed to summarise model performance. The combination that minimises this score is identified and stored as the best-performing solution. Finally, the tuning framework produces diagnostic plots and summary tables that allow the user to evaluate model behaviour, assess trade-offs, and verify the performance of the selected parameter set.
 
-2. Generate multiple ALADYM configuration files
+The tuning procedure is deliberately restricted to a defined subset of ALADYM biological parameters, ensuring that calibration targets only the processes of interest.
 
-3. Run ALADYM automatically for each configuration
 
-4. Extract simulation outputs
+<p align="center">
+  <img src="fig1.png" width="60%">
+</p>
 
-5. Compare simulations to assessment data
+```{r, echo=FALSE, results='asis', message=FALSE}
 
-6. Compute a score for each parameter combination
+library(knitr)
+library(kableExtra)
 
-7. Identify and store the best-performing combination
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 1 - Conceptual overview of ALADYM tuning framework.
+</div>')
 
-8. Produce diagnostic plots and summary tables
 
-The tuning procedure operates on a restricted set of ALADYM biological parameters.
+```
 
-**Stage 1**. In this stage the parameters that are varied are the recruitment time parameter _Tr_ and the age range over which fishing mortality is averaged, _Fbar_.
-
-**Stage 2**. In this stage the best Tr-Fbar combination from Stage 1 is used and the varied parameters are the selectivity parameters by fleet and gear. This stage evaluates both stock-level and fleet-level consistency.
+Specifically, the tuning process is a two-stage process. In **Stage 1**, the biological parameters of recruitment time _Tr_ and the age range over which fishing mortality is averaged _Fbar_ are tuned. Once the best combination is found, this is used in **Stage 2** to tune the fleet- and gear-specific selectivity parameters. This stage evaluates both stock-level and fleet-level consistency.
 
 Note that the stages are executed sequentially, not jointly.
 
@@ -182,7 +183,7 @@ Each generated configuration file differs from the baseline only in the Tr value
 
 The naming convention encodes the Tr–Fbar combination, ensuring that each run can be uniquely identified and traced back to its parameter values.
 
- ** EXAMPLE OF NAMING CONVENTION **
+ **EXAMPLE OF NAMING CONVENTION**
 
 Once this script has been executed, no further manual editing of configuration files is required.
 
@@ -301,477 +302,3 @@ The best-performing configuration is identified based on the defined score crite
 
 
 
-
-
-# Input data requirements
-
-The tuning scripts require the following inputs:
-
-- A valid ALADYM configuration file (baseline)
-
-- Assessment-derived time series:
-
-+ Spawning Stock Biomass (SSB)
-
-Mean fishing mortality (Fbar)
-
-+ Total catch
-
-Fleet-specific catches (for selectivity tuning)
-
-Biological inputs consistent with ALADYM conventions:
-
-Natural mortality starting at age 0
-
-No NA values (use NAN instead)
-
-All assessment data must cover the same year range used in ALADYM.
-
-
-
-**r / Fbar tuning: how to generate and run combinations**
-
--   **Define the parameter ranges** 
-
-<!-- -->
-
--   Open ALADYM_tuning_main_config.R 
-
-<!-- -->
-
--   Edit the vectors defining the grid: 
-
-<!-- -->
-
--   tr_values \<- c(...) 
-
-<!-- -->
-
--   Fbar_values \<- c(...) 
-
-<!-- -->
-
--   The script uses these vectors to generate all combinations
-    (Cartesian product) 
-
-<!-- -->
-
--   **Prepare the base configuration file** 
-
-<!-- -->
-
--   Use a valid ALADYM configuration as template 
-
-<!-- -->
-
--   Ensure: 
-
-<!-- -->
-
--   M-at-age starts from age 0 
-
-<!-- -->
-
--   All missing values are written as "NAN" (not NA) 
-
-<!-- -->
-
--   The script assumes this file follows the expected ALADYM structure 
-
-<!-- -->
-
--   **Run the configuration generator** 
-
-<!-- -->
-
--   Execute ALADYM_tuning_main_config.R 
-
-<!-- -->
-
--   The script: 
-
-<!-- -->
-
--   Creates one configuration file per (tr, Fbar) combination 
-
-<!-- -->
-
--   Automatically assigns a unique combo tag (e.g. 0.2_0.5) 
-
-<!-- -->
-
--   Saves all generated configs into: 
-
-C:/INPUT/ALADYM/ 
-
--   **Run the tuning** 
-
-<!-- -->
-
--   Launch the main tuning script (e.g. ALADYM_tuning.R) 
-
-<!-- -->
-
--   The script: 
-
-<!-- -->
-
--   Iterates over all configuration files 
-
-<!-- -->
-
--   Runs ALADYM once per configuration 
-
-<!-- -->
-
--   Extracts outputs (SSB, Fbar, catch, etc.) 
-
-<!-- -->
-
--   Computes the score for each run 
-
-<!-- -->
-
--   Stores results in: 
-
-<!-- -->
-
--   CAL\$score 
-
-<!-- -->
-
--   CAL\$errors 
-
-<!-- -->
-
--   One output folder per combo 
-
-<!-- -->
-
--   **Generate diagnostics** 
-
-<!-- -->
-
--   Run the diagnostics plotting section 
-
-<!-- -->
-
--   This automatically produces: 
-
-<!-- -->
-
--   Fan plots (all combinations vs observed) 
-
-<!-- -->
-
--   Best-combo plots 
-
-<!-- -->
-
--   CSV summary of scores 
-
-<!-- -->
-
--   Outputs are saved in: 
-
-<!-- -->
-
--   Combo_runs_diagnostics/ 
-
-<!-- -->
-
--   Best_combo_diagnostics/ 
-
-<!-- -->
-
--   **Select the best candidate** 
-
-<!-- -->
-
--   Identify: 
-
-<!-- -->
-
--   The lowest-score combination 
-
-<!-- -->
-
--   This selected combination becomes the fixed input for Step 2 
-
-<!-- -->
-
--   **Purpose of the tuning** 
-
-<!-- -->
-
--   Why tr and Fbar are influential parameters 
-
-<!-- -->
-
--   Exploratory, automated calibration 
-
-<!-- -->
-
--   **Experimental design** 
-
-<!-- -->
-
--   Definition of tr range 
-
-<!-- -->
-
--   Definition of Fbar range 
-
-<!-- -->
-
--   How the parameter grid is constructed 
-
-<!-- -->
-
--   **Model outputs used for evaluation** 
-
-<!-- -->
-
--   Annual SSB time series 
-
-<!-- -->
-
--   Annual Fbar time series 
-
-<!-- -->
-
--   Total catch time series 
-
-<!-- -->
-
--   **Definition of the score** 
-
-<!-- -->
-
--   Relative error formulation 
-
-<!-- -->
-
--   Use of mean squared relative error 
-
-<!-- -->
-
--   Limitations (e.g. shape mismatches, timing mismatches, compensating
-    errors) 
-
-# **Step 2 — Selectivity tuning: how to generate and run combinations** 
-
--   **Start from the best tr/Fbar combination** 
-
-<!-- -->
-
--   Fix tr and Fbar to the values selected in Step 1 
-
-<!-- -->
-
--   All further experiments modify only selectivity parameters 
-
-<!-- -->
-
--   **Define the selectivity parameter space** 
-
-<!-- -->
-
--   Open the selectivity tuning script (e.g. ALADYM_tuning_sel.R) 
-
-<!-- -->
-
--   Define candidate values: 
-
-<!-- -->
-
--   p1 \<- c(...) 
-
-<!-- -->
-
--   p2 \<- c(...) 
-
-<!-- -->
-
--   p3 \<- c(...) 
-
-<!-- -->
-
--   etc. 
-
-<!-- -->
-
--   These represent biologically plausible alternatives, not arbitrary
-    numbers 
-
-<!-- -->
-
--   **Respect selectivity type logic** 
-
-<!-- -->
-
--   The script maps each sel_type to the parameters it actually uses: 
-
-<!-- -->
-
--   Example: 
-
-<!-- -->
-
--   Type 1 → only param1, param2 
-
-<!-- -->
-
--   Type 4 → uses param1, param2, param3 
-
-<!-- -->
-
--   Unused parameters remain present in the file but are ignored by the
-    model 
-
-<!-- -->
-
--   **Automatic generation of selectivity configurations** 
-
-<!-- -->
-
--   The script: 
-
-<!-- -->
-
--   Builds all valid parameter combinations using expand.grid 
-
-<!-- -->
-
--   Applies these consistently across all gears 
-
-<!-- -->
-
--   Generates one configuration file per selectivity setup 
-
-<!-- -->
-
--   Preserves the original file structure (only values change) 
-
-<!-- -->
-
--   **Run the selectivity tuning** 
-
-<!-- -->
-
--   Execute the tuning script 
-
-<!-- -->
-
--   For each configuration, the script: 
-
-<!-- -->
-
--   Runs ALADYM 
-
-<!-- -->
-
--   Computes: 
-
-<!-- -->
-
--   Global errors (SSB, Fbar, catch) 
-
-<!-- -->
-
--   Fleet-specific errors 
-
-<!-- -->
-
--   Saves outputs into one folder per configuration 
-
-<!-- -->
-
--   **Generate fleet-level diagnostics** 
-
-<!-- -->
-
--   The plotting functions automatically: 
-
-<!-- -->
-
--   Read simulated and observed fleet catches 
-
-<!-- -->
-
--   Produce: 
-
-<!-- -->
-
--   One plot per gear showing all simulations vs observations 
-
-<!-- -->
-
--   Multipanel plots grouping gears (max 9 per panel) 
-
-<!-- -->
-
--   **Why this stage is fundamentally different** 
-
-<!-- -->
-
--   Focus shifts from global dynamics to exploitation structure 
-
-<!-- -->
-
--   Objective: realistic fleet- and size-based patterns 
-
-<!-- -->
-
--   **Design of the selectivity experiment** 
-
-<!-- -->
-
--   Which parameters are varied 
-
-<!-- -->
-
--   Which parameters remain fixed from stage 1 
-
-<!-- -->
-
--   Grid construction or parameter combinations 
-
-<!-- -->
-
--   **Fleet-level visualization** 
-
-<!-- -->
-
--   One plot per gear 
-
-<!-- -->
-
--   All combinations vs observed time series 
-
-<!-- -->
-
--   **Practical workflow** 
-
-<!-- -->
-
--   Run selectivity combinations 
-
-<!-- -->
-
--   Generate diagnostics 
-
-<!-- -->
-
--   Shortlist promising configurations 
-
-<!-- -->
-
--   Inspect fleet plots 
-
-<!-- -->
-
--   Select final configuration 
-
-<!-- -->
-- check other requirements

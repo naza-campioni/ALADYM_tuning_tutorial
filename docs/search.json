@@ -4,7 +4,7 @@
     "href": "ALADYM_tuning_tutorial.html",
     "title": "ALADYM_tuning_tutorial",
     "section": "",
-    "text": "Compiled on 03/02/2026, 14:10"
+    "text": "COISPA Website    COISPA Github"
   },
   {
     "objectID": "ALADYM_tuning_tutorial.html#input-data-requirements",
@@ -18,7 +18,7 @@
     "href": "ALADYM_tuning_tutorial.html#generation-of-trfbar-combinations",
     "title": "ALADYM_tuning_tutorial",
     "section": "Generation of Tr–Fbar combinations",
-    "text": "Generation of Tr–Fbar combinations\nTr–Fbar tuning is based on a grid search approach. The parameter space is discretised into a finite set of Tr values and Fbar age ranges, and ALADYM is run once for each possible combination.\nThe generation of parameter combinations is handled by the script:\nALADYM_tuning_main_config.R\nThis script performs the following operations:\n\nReads the baseline ALADYM configuration file.\nDefines the vectors of Tr values and Fbar age ranges to be explored.\nCreates all possible Tr–Fbar combinations using a Cartesian product.\nWrites a new ALADYM configuration file for each combination.\n\nEach generated configuration file differs from the baseline only in the Tr value and the Fbar age range. All other settings are inherited unchanged. The resulting configuration files are automatically written to:\nC:/INPUT/ALADYM\nThe naming convention encodes the Tr–Fbar combination, ensuring that each run can be uniquely identified and traced back to its parameter values.\n** EXAMPLE OF NAMING CONVENTION **\nOnce this script has been executed, no further manual editing of configuration files is required."
+    "text": "Generation of Tr–Fbar combinations\nTr–Fbar tuning is based on a grid search approach. The parameter space is discretised into a finite set of Tr values and Fbar age ranges, and ALADYM is run once for each possible combination.\nThe generation of parameter combinations is handled by the script:\nALADYM_tuning_main_config.R\nThis script performs the following operations:\n\nReads the baseline ALADYM configuration file.\nDefines the vectors of Tr values and Fbar age ranges to be explored.\nCreates all possible Tr–Fbar combinations using a Cartesian product.\nWrites a new ALADYM configuration file for each combination.\n\nEach generated configuration file differs from the baseline only in the Tr value and the Fbar age range. All other settings are inherited unchanged. The resulting configuration files are automatically written to:\nC:/INPUT/ALADYM\nThe naming convention encodes the Tr–Fbar combination, ensuring that each run can be uniquely identified and traced back to its parameter values.\nEXAMPLE OF NAMING CONVENTION\nOnce this script has been executed, no further manual editing of configuration files is required."
   },
   {
     "objectID": "ALADYM_tuning_tutorial.html#running-the-trfbar-tuning",
