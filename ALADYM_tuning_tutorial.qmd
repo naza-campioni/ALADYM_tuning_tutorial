@@ -1,9 +1,7 @@
 ---
 title: "ALADYM_tuning_tutorial"
 author: "Nazareno Campioni"
-format:
-  html:
-    embed-resources: true
+format: html
 editor: 
   markdown:
     wrap: 72
@@ -152,7 +150,11 @@ Natural mortality (M) files must start at age 0. Any offset in age indexing will
 
 Missing values in all configuration files **must be encoded as NAN**, not NA. ALADYM is not NA-aware. Using NA leads to type coercion, failed reads, or numerical propagation of missing values - NAN is explicitly handled by the model and by the tuning scripts.
 
-The ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided [here](aladym_config.csv).
+The ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided
+<a href="aladym_config.csv" download>
+here.
+</a>
+ 
 
 ```{r, echo=FALSE, results='markup', message=FALSE}
 
@@ -177,53 +179,120 @@ The generation of parameter combinations is handled by the script:
 
 `ALADYM_tuning_main_config.R`
 
+This script reconstructs all mortality-related inputs so that each ALADYM run is internally consistent with the selected Tr–Fbar combination. In practice, the script performs the following operations.
 
-This script performs the following operations:
+It first reads a baseline ALADYM configuration file located in `C:\INPUT\ALADYM`. The script then defines the vectors of Tr values and Fbar age ranges to be explored and builds the full Cartesian product of these parameters.
 
-- Reads the baseline ALADYM configuration file.
+For each Tr–Fbar combination, the script automatically generates three classes of files:
 
-- Defines the vectors of Tr values and Fbar age ranges to be explored.
+- M files, truncated or shifted so that natural mortality starts at the specified Tr value.
 
-- Creates all possible Tr–Fbar combinations using a Cartesian product.
+- Z files, recalculated to reflect both the selected age-grouping criterion for Fbar and the current Tr value.
 
-- Writes a new ALADYM configuration file for each combination.
+- ALADYM configuration files, updated so that they reference the correct M and Z files associated with that specific combination.
 
-Each generated configuration file differs from the baseline only in the Tr value and the Fbar age range. All other settings are inherited unchanged. The resulting configuration files are automatically written to:
+All generated configuration files differ from the baseline only in the Tr definition, the Fbar age range, and the mortality file paths. Every other parameter and model setting is inherited unchanged from the baseline configuration.
 
-`C:/INPUT/ALADYM`
+Note, the script assumes the following directory structure and requirements:
 
-The naming convention encodes the Tr–Fbar combination, ensuring that each run can be uniquely identified and traced back to its parameter values.
+1. The original baseline ALADYM configuration file must be located in
+`C:\INPUT\ALADYM`.
 
- **EXAMPLE OF NAMING CONVENTION**
+2. Species-specific M and F input files must be stored in
+`C:\INPUT\ALADYM\species_folder`.
 
-Once this script has been executed, no further manual editing of configuration files is required.
+If fishing mortality at age files are not available, the parameters **F_at_age_F** and **F_at_age_M** must be set to "None" in the baseline configuration. In this case, an **Fbar_assessment** file must be provided. All Z values will then be computed internally from the Fbar assessment data for each Tr–Fbar combination. This can be seen in the following example code.
+
+```{r, echo=TRUE, results='asis', message=FALSE}
+
+## paths
+# input path - main folder where we can find M, F and config_file
+ip <- "C:\\INPUT\\ALADYM"
+
+# output path - where you want to save the output (usually C:\INPUT\ALADYM)
+op <- "C:\\INPUT\\ALADYM"
+
+# species folder - used for M and F files
+species_folder <- "MUT1718"
+
+
+# are there different M files for males and females?
+M_different <- TRUE
+
+
+## set the M files names -> make sure these start from age = 0 
+# sex-specific files?
+M_male <- "M_MUT_M.csv"
+M_female <- "M_MUT_F.csv"
+
+# instead, if they have the same file:
+M_file <- "M_MUT.csv"
+
+
+## if F_at_age files exist
+F_at_age_M <- "F_at_age_MUT_M.csv"
+F_at_age_F <- "F_at_age_MUT_F.csv"
+Fbar_assessment <- "None"
+
+# otherwise, if there is only an Fbar file coming from the assessment
+# F_at_age_M <- "None"
+# F_at_age_F <- "None
+# Fbar_assessment <- "Fbar_assessment_MUT.csv"
+
+## set initial configuration file -> must live in C:\INPUT\ALADYM
+## make sure that NA values are specified as NAN (needed for the splitting)
+configuration <- "aladym_MUT_GSA17_18.csv"
+
+## set tr
+tr = c(0, 1, 2, 3)
+
+## set F_range over which to calculate Fbar, eg: list(c(0,3),c(1,4))
+# if you only have Fbar from assessment, set F_range = None
+
+F_range = list(c(0,1),c(2,3),c(4,5))
+# F_range = "None"
+
+
+## time series
+ts = c(2004:2024)
+
+## species
+spe = 'MUT'
+
+```
+
+```{r, message=FALSE, echo=FALSE}
+cat('Example of input paths for the creation of different ALADYM configuration files.')
+```
+
+All generated files are written automatically to `C:\INPUT\ALADYM`. The naming convention encodes the Tr value and the Fbar age range directly in the filename, allowing each simulation to be uniquely identified and unambiguously traced back to its parameter values.
+
+Two examples of the naming convention are as follows:
+
+1. `config_run_0_1-3.csv` means the configuration file considers `tr = 0` and `Fbar = (1-3)`;
+2. `config_run_0_assess.csv` means the configuration file considers `tr = 0` and uses the `Fbar` range used in the assessment.
+
+Once `ALADYM_tuning_main_config.R` has completed execution, no further manual editing of M files, Z files, or configuration files is required.
 
 ## Running the Tr–Fbar tuning
 
-After the configuration files have been generated, the tuning itself is launched using:
+Before launching the tuning procedure, the assessment reference files must already be available. These files are derived from the landings and assessment datasets that have been previously converted into ALADYM-compatible format. No conversion or preprocessing of assessment data is performed at this stage: the tuning procedure assumes that the assessment SSB, Fbar, and catch time series are already present and correctly formatted.
+
+Once all Tr–Fbar–specific configuration files have been generated, the tuning phase is launched using:
 
 `ALADYM_tuning.R`
 
+This script orchestrates the full calibration workflow. It iterates sequentially over all Tr–Fbar configuration files created in the previous step and launches ALADYM in batch mode for each configuration without requiring user interaction.
 
-This script automatically:
-
-- iterates over all Tr–Fbar configuration files,
-
-- launches ALADYM in batch mode for each configuration,
-
-- extracts annual SSB, Fbar, and total catch from the simulation outputs,
-
-- computes relative errors with respect to assessment data,
-
-- calculates a scalar score for each combination as the sum of mean squared relative errors,
-
-- stores results in a cumulative calibration table.
-
-The procedure is entirely automated. No user interaction is required while the tuning is running.
-
-At the end of the process, the script identifies the Tr–Fbar combination with the lowest total score and records it as the best-performing configuration.
+For every Tr–Fbar combination, the script extracts annual time series of spawning stock biomass (SSB), Fbar, and total catch from the ALADYM outputs. These simulated quantities are then compared against the corresponding assessment data. Relative errors are computed, and a scalar score is calculated for each combination as the sum of mean squared relative errors across all indicators.
 
 ## Outputs and diagnostics
+
+All results are accumulated into a single calibration table that links each Tr–Fbar combination to its diagnostic metrics and overall score. In parallel, the script creates a dedicated output folder for each parameter combination. Each folder contains the full set of diagnostic plots and intermediate results associated with that specific run, allowing post hoc inspection of individual simulations.
+
+At the end of the tuning process, the script identifies the Tr–Fbar combination with the lowest total score. This best-performing configuration is recorded in a plain text file that reports the selected Tr value, Fbar age range, and associated score. In addition, two summary output directories are produced: one containing the diagnostics for all tested combinations, and a second containing only the diagnostics associated with the best-performing configuration.
+
+All output folders and files generated by ALADYM_tuning.R are written to the same directory in which the tuning script resides. No automatic cleanup is performed. To maintain an organised project structure, it is recommended to manually create a species-specific folder and move all tuning outputs into that location once the procedure has completed.
 
 For each Tr–Fbar combination, ALADYM outputs are saved in a dedicated folder named after the parameter combination. These folders contain the extracted annual time series used for calibration.
 
