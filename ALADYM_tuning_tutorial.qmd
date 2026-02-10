@@ -1,7 +1,9 @@
 ---
 title: "ALADYM_tuning_tutorial"
 author: "Nazareno Campioni"
-format: html
+format:
+  html:
+    embed-resources: true
 editor: 
   markdown:
     wrap: 72
@@ -150,19 +152,20 @@ Natural mortality (M) files must start at age 0. Any offset in age indexing will
 
 Missing values in all configuration files **must be encoded as NAN**, not NA. ALADYM is not NA-aware. Using NA leads to type coercion, failed reads, or numerical propagation of missing values - NAN is explicitly handled by the model and by the tuning scripts.
 
-The ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided here:
+The ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided [here](aladym_config.csv).
 
 ```{r, echo=FALSE, results='markup', message=FALSE}
+
 csv_ex <- read.csv("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_tutorial\\aladym_config.csv", sep = ';', header = TRUE)
+
+csv_ex[is.na(csv_ex)] <- ""
 
 head(csv_ex)
 
+cat('Example ALADYM configuration file.')
+
 ```
 
-
-**ADD CSV EXAMPLE HERE**
-(example of a correctly formatted ALADYM input file, not a BEMTOOL file)
-**LINK TO TEMPLATE CONFIGURATION – TO BE ADDED**
 
 Finally, the simulation period defined in the configuration must match exactly the years available in the assessment time series used for calibration. No extrapolation or truncation is performed automatically.
 
