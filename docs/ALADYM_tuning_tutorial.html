@@ -154,6 +154,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles-quarto.css">
 </head>
@@ -319,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <li><p>input data are internally consistent,</p></li>
 <li><p>assessment outputs (SSB, Fbar, catches) are available as reference series.</p></li>
 </ul>
-<p>This tuning module is not a replacement for the standard BEMTOOL workflow. It is an upstream calibration step intended to improve the biological consistency of ALADYM before running management or bioeconomic scenarios. No knowledge of BEMTOOL’s economic or management scenario modules is required to apply the tuning, in that only ALADYM parameters are tuned.</p>
+<p>This tuning module is not a replacement for the standard BEMTOOL workflow. It is a calibration step intended to improve the biological consistency of ALADYM before running management or bioeconomic scenarios. No knowledge of BEMTOOL’s economic or management scenario modules is required to apply the tuning, in that only ALADYM parameters are tuned.</p>
 <p>The approach is a structured grid search: no optimisation algorithm is employed. The procedure is diagnostic and comparative, not predictive.</p>
 <p>For a full description of BEMTOOL structure, data requirements, and installation, refer to the official tutorial: <a href="https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html">BEMTOOL Tutorial</a>.</p>
 <p>Installation of BEMTOOL and ALADYM must be completed following that guide before attempting any tuning procedure described below.</p>
@@ -337,26 +366,26 @@ document.addEventListener("DOMContentLoaded", function(){
 <img src="fig1.png" width="60%">
 </p>
 <div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
-<p>Figure 1 - Conceptual overview of ALADYM tuning framework.</p>
+<p>Figure 1 - Conceptual overview of the ALADYM tuning framework.</p>
 </div>
 <p>Specifically, the tuning process is a two-stage process. In <strong>Stage 1</strong>, the biological parameters of recruitment time <em>Tr</em> and the age range over which fishing mortality is averaged <em>Fbar</em> are tuned. Once the best combination is found, this is used in <strong>Stage 2</strong> to tune the fleet- and gear-specific selectivity parameters. This stage evaluates both stock-level and fleet-level consistency.</p>
 <p>Note that the stages are executed sequentially, not jointly.</p>
 </section>
 <section id="tr-fbar-tuning" class="level1">
 <h1>Tr-Fbar tuning</h1>
-<p>The Tr–Fbar tuning explores alternative combinations of the recruitment timing parameter Tr and the age range used to compute mean fishing mortality Fbar. All other biological and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.</p>
+<p>The <em>Tr–Fbar</em> tuning explores alternative combinations of the recruitment timing parameter <em>Tr</em> and the age range used to compute mean fishing mortality <em>Fbar</em>. All other biological and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.</p>
 <section id="input-data-requirements" class="level2">
 <h2 class="anchored" data-anchor-id="input-data-requirements">Input data requirements</h2>
-<p>After installation of the ALADYM tuning software, a baseline ALADYM configuration must be prepared. This baseline configuration is the structural reference from which all tuning combinations are generated. Every Tr–Fbar or selectivity configuration produced by the tuning scripts is a direct modification of this baseline.</p>
+<p>After installation of the ALADYM tuning software, a baseline ALADYM configuration must be prepared. This baseline configuration is the structural reference from which all tuning combinations are generated. Every Tr–Fbar configuration produced by the tuning scripts is a direct modification of this baseline.</p>
 <p>Several constraints are critical.</p>
-<p>Natural mortality (M) files must start at age 0. Any offset in age indexing will cause silent misalignment between biological processes and assessment data, invalidating error calculations.</p>
+<p>Natural mortality (M) files must start at age 0. Any offset in age indexing will cause misalignment between biological processes and assessment data, leading to error calculations.</p>
 <p>Missing values in all configuration files <strong>must be encoded as NAN</strong>, not NA. ALADYM is not NA-aware. Using NA leads to type coercion, failed reads, or numerical propagation of missing values - NAN is explicitly handled by the model and by the tuning scripts.</p>
 <p>The ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided <a href="aladym_config.csv" download=""> here. </a></p>
 <div class="cell">
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameters"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Distribution"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Min"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Max"],"name":[4],"type":["chr"],"align":["left"]},{"label":["A"],"name":[5],"type":["chr"],"align":["left"]},{"label":["B"],"name":[6],"type":["chr"],"align":["left"]},{"label":["X"],"name":[7],"type":["chr"],"align":["left"]},{"label":["X.1"],"name":[8],"type":["chr"],"align":["left"]},{"label":["X.2"],"name":[9],"type":["chr"],"align":["left"]},{"label":["X.3"],"name":[10],"type":["chr"],"align":["left"]},{"label":["X.4"],"name":[11],"type":["chr"],"align":["left"]},{"label":["X.5"],"name":[12],"type":["chr"],"align":["left"]},{"label":["X.6"],"name":[13],"type":["chr"],"align":["left"]},{"label":["X.7"],"name":[14],"type":["chr"],"align":["left"]},{"label":["X.8"],"name":[15],"type":["chr"],"align":["left"]},{"label":["X.9"],"name":[16],"type":["chr"],"align":["left"]},{"label":["X.10"],"name":[17],"type":["chr"],"align":["left"]},{"label":["X.11"],"name":[18],"type":["chr"],"align":["left"]},{"label":["X.12"],"name":[19],"type":["chr"],"align":["left"]},{"label":["X.13"],"name":[20],"type":["chr"],"align":["left"]},{"label":["X.14"],"name":[21],"type":["chr"],"align":["left"]}],"data":[{"1":"Scientific name","2":"Mullus barbatus","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","_rn_":"1"},{"1":"Common name","2":"Red mullet","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","_rn_":"2"},{"1":"GSA","2":"17-18","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","_rn_":"3"},{"1":"start - end simulation - end forecast","2":"2004","3":"2024","4":"2030","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","_rn_":"4"},{"1":"Years to be presimulated","2":"18","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","_rn_":"5"},{"1":"Number of years for average","2":"1","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameters"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Distribution"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Min"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Max"],"name":[4],"type":["chr"],"align":["left"]},{"label":["A"],"name":[5],"type":["chr"],"align":["left"]},{"label":["B"],"name":[6],"type":["chr"],"align":["left"]},{"label":["X"],"name":[7],"type":["chr"],"align":["left"]},{"label":["X.1"],"name":[8],"type":["chr"],"align":["left"]},{"label":["X.2"],"name":[9],"type":["chr"],"align":["left"]},{"label":["X.3"],"name":[10],"type":["chr"],"align":["left"]},{"label":["X.4"],"name":[11],"type":["chr"],"align":["left"]},{"label":["X.5"],"name":[12],"type":["chr"],"align":["left"]},{"label":["X.6"],"name":[13],"type":["chr"],"align":["left"]},{"label":["X.7"],"name":[14],"type":["chr"],"align":["left"]},{"label":["X.8"],"name":[15],"type":["chr"],"align":["left"]},{"label":["X.9"],"name":[16],"type":["chr"],"align":["left"]},{"label":["X.10"],"name":[17],"type":["chr"],"align":["left"]},{"label":["X.11"],"name":[18],"type":["chr"],"align":["left"]},{"label":["X.12"],"name":[19],"type":["chr"],"align":["left"]},{"label":["X.13"],"name":[20],"type":["chr"],"align":["left"]},{"label":["X.14"],"name":[21],"type":["chr"],"align":["left"]},{"label":["X.15"],"name":[22],"type":["chr"],"align":["left"]},{"label":["X.16"],"name":[23],"type":["chr"],"align":["left"]},{"label":["X.17"],"name":[24],"type":["chr"],"align":["left"]},{"label":["X.18"],"name":[25],"type":["chr"],"align":["left"]},{"label":["X.19"],"name":[26],"type":["chr"],"align":["left"]},{"label":["X.20"],"name":[27],"type":["chr"],"align":["left"]},{"label":["X.21"],"name":[28],"type":["chr"],"align":["left"]},{"label":["X.22"],"name":[29],"type":["chr"],"align":["left"]},{"label":["X.23"],"name":[30],"type":["chr"],"align":["left"]},{"label":["X.24"],"name":[31],"type":["chr"],"align":["left"]},{"label":["X.25"],"name":[32],"type":["chr"],"align":["left"]}],"data":[{"1":"Scientific name","2":"Merluccius merluccius","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"1"},{"1":"Common name","2":"European hake","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"2"},{"1":"GSA","2":"17-18","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"3"},{"1":"start - end simulation - end forecast","2":"2004","3":"2024","4":"2030","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"4"},{"1":"Years to be presimulated","2":"21","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"5"},{"1":"Number of years for average","2":"1","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"6"},{"1":"gears","2":"ALB_18_DTS_1224","3":"HRV_17_DFN_0612","4":"HRV_17_HOK_0018_NoJabuka","5":"HRV_17_DTS_0640_NoJabuka","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"7"},{"1":"Sex ratio","2":"0.5","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"8"},{"1":"L-W parameters - Male","2":"","3":"","4":"","5":"9.20E-06","6":"2.9","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"9"},{"1":"L-W parameters - Female","2":"","3":"","4":"","5":"8.14E-06","6":"2.9","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"10"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -454,27 +483,42 @@ document.addEventListener("DOMContentLoaded", function(){
 </section>
 <section id="running-the-trfbar-tuning" class="level2">
 <h2 class="anchored" data-anchor-id="running-the-trfbar-tuning">Running the Tr–Fbar tuning</h2>
-<p>Before launching the tuning procedure, the assessment reference files must already be available. These files are derived from the landings and assessment datasets that have been previously converted into ALADYM-compatible format. No conversion or preprocessing of assessment data is performed at this stage: the tuning procedure assumes that the assessment SSB, Fbar, and catch time series are already present and correctly formatted.</p>
-<p>Once all Tr–Fbar–specific configuration files have been generated, the tuning phase is launched using:</p>
-<p><code>ALADYM_tuning.R</code></p>
-<p>This script orchestrates the full calibration workflow. It iterates sequentially over all Tr–Fbar configuration files created in the previous step and launches ALADYM in batch mode for each configuration without requiring user interaction.</p>
-<p>For every Tr–Fbar combination, the script extracts annual time series of spawning stock biomass (SSB), Fbar, and total catch from the ALADYM outputs. These simulated quantities are then compared against the corresponding assessment data. Relative errors are computed, and a scalar score is calculated for each combination as the sum of mean squared relative errors across all indicators.</p>
+<p>Once all Tr–Fbar configuration files have been generated, the tuning phase is launched by clicking on the <em>source</em> button in the file</p>
+<p><code>ALADYM_tuning.R</code>.</p>
+<p>This script operates the full calibration workflow. It iterates sequentially over all Tr–Fbar configuration files created in the previous step by launching ALADYM in batch mode for each configuration without requiring user interaction.</p>
+<p>For every Tr–Fbar combination, the script extracts annual time series of spawning stock biomass (SSB), Fbar, and total catch from the ALADYM outputs, which are then compared against the corresponding assessment data. Relative errors are computed, and a scalar score is calculated for each combination as the sum of mean squared relative errors across all indicators (see next section).</p>
 </section>
 <section id="outputs-and-diagnostics" class="level2">
 <h2 class="anchored" data-anchor-id="outputs-and-diagnostics">Outputs and diagnostics</h2>
-<p>All results are accumulated into a single calibration table that links each Tr–Fbar combination to its diagnostic metrics and overall score. In parallel, the script creates a dedicated output folder for each parameter combination. Each folder contains the full set of diagnostic plots and intermediate results associated with that specific run, allowing post hoc inspection of individual simulations.</p>
+<p>The calibration score is defined as the sum of mean squared relative errors between simulated and assessment time series for SSB, Fbar, and total catch. For each indicator <span class="math inline">\(X\)</span>, the relative error is computed as</p>
+<p><span class="math display">\[
+Err_t = \frac{X_t^{sim} - X_t^{obs}}{X_t^{sim}},
+\]</span> and the total score is</p>
+<p><span class="math display">\[
+Score = \frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2 + \frac{1}{T} \sum_{t=1}^T (Err_t^{Fbar})^2 + \frac{1}{T} \sum_{t=1}^T (Err_t^{Catch})^2.
+\]</span> The use of squared relative errors ensures scale-independence across indicators with different magnitudes and penalises large deviations more strongly than small ones.</p>
+<p>All results are accumulated into a single calibration table that links each Tr–Fbar combination to its diagnostic metrics and overall score, found in the <code>Combo_runs_diagnostics</code> folder.</p>
+<p align="center">
+<img src="calibration_table.png" width="60%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 2 - Calibration table.</p>
+</div>
+<p>In parallel, the script creates a dedicated output folder for each parameter combination. Each folder contains the full set of diagnostic plots and intermediate results associated with that specific run, allowing post hoc inspection of individual simulations.</p>
 <p>At the end of the tuning process, the script identifies the Tr–Fbar combination with the lowest total score. This best-performing configuration is recorded in a plain text file that reports the selected Tr value, Fbar age range, and associated score. In addition, two summary output directories are produced: one containing the diagnostics for all tested combinations, and a second containing only the diagnostics associated with the best-performing configuration.</p>
-<p>All output folders and files generated by ALADYM_tuning.R are written to the same directory in which the tuning script resides. No automatic cleanup is performed. To maintain an organised project structure, it is recommended to manually create a species-specific folder and move all tuning outputs into that location once the procedure has completed.</p>
-<p>For each Tr–Fbar combination, ALADYM outputs are saved in a dedicated folder named after the parameter combination. These folders contain the extracted annual time series used for calibration.</p>
-<p>** ADD EXAMPLE FOLDER NAME **</p>
-<p>In addition, the tuning script produces:</p>
-<ul>
-<li><p>a summary table of errors and scores for all combinations,</p></li>
-<li><p>diagnostic plots comparing simulations to assessment data,</p></li>
-<li><p>highlighted plots for the best-performing Tr–Fbar combination.</p></li>
-</ul>
-<p>These outputs allow both quantitative comparison and visual inspection of model behaviour across the explored parameter space.</p>
-<p>This concludes the Tr–Fbar tuning stage. Subsequent tuning steps, such as selectivity calibration, build directly on the optimal Tr–Fbar configuration identified here.</p>
+<p align="center">
+<img src="AL_tutorial_diagnostics_folders.png" width="80%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 3 - Example of folders and files created after ALADYM tuning is complete.</p>
+</div>
+<p>All output folders and files generated by <code>ALADYM_tuning.R</code> are written to the same directory in which the tuning script lives. No automatic cleanup is performed. To maintain an organised project structure, it is recommended to manually create a species-specific folder and move all tuning outputs into that location once the procedure has completed, as shown below:</p>
+<p align="center">
+<img src="cleanup_folder.png" width="80%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 4 - Example of species-specific folders to cleanup the repository.</p>
+</div>
 </section>
 </section>
 <section id="selectivity-tuning" class="level1">

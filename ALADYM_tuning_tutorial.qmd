@@ -94,7 +94,7 @@ The tuning framework is designed to be used after a standard BEMTOOL/ALADYM setu
 - assessment outputs (SSB, Fbar, catches) are available as reference series.
 
 
-This tuning module is not a replacement for the standard BEMTOOL workflow. It is an upstream calibration step intended to improve the biological consistency of ALADYM before running management or bioeconomic scenarios. No knowledge of BEMTOOL’s economic or management scenario modules is required to apply the tuning, in that only ALADYM parameters are tuned.
+This tuning module is not a replacement for the standard BEMTOOL workflow. It is a calibration step intended to improve the biological consistency of ALADYM before running management or bioeconomic scenarios. No knowledge of BEMTOOL’s economic or management scenario modules is required to apply the tuning, in that only ALADYM parameters are tuned.
 
 The approach is a structured grid search: no optimisation algorithm is employed. The procedure is diagnostic and comparative, not predictive.
 
@@ -125,9 +125,8 @@ library(knitr)
 library(kableExtra)
 
 cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
-Figure 1 - Conceptual overview of ALADYM tuning framework.
+Figure 1 - Conceptual overview of the ALADYM tuning framework.
 </div>')
-
 
 ```
 
@@ -137,16 +136,16 @@ Note that the stages are executed sequentially, not jointly.
 
 # Tr-Fbar tuning
 
-The Tr–Fbar tuning explores alternative combinations of the recruitment timing parameter Tr and the age range used to compute mean fishing mortality Fbar. All other biological and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.
+The _Tr–Fbar_ tuning explores alternative combinations of the recruitment timing parameter _Tr_ and the age range used to compute mean fishing mortality _Fbar_. All other biological and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.
 
 ## Input data requirements
 
-After installation of the ALADYM tuning software, a baseline ALADYM configuration must be prepared. This baseline configuration is the structural reference from which all tuning combinations are generated. Every Tr–Fbar or selectivity configuration produced by the tuning scripts is a direct modification of this baseline. 
+After installation of the ALADYM tuning software, a baseline ALADYM configuration must be prepared. This baseline configuration is the structural reference from which all tuning combinations are generated. Every Tr–Fbar configuration produced by the tuning scripts is a direct modification of this baseline. 
 
 
 Several constraints are critical.
 
-Natural mortality (M) files must start at age 0. Any offset in age indexing will cause silent misalignment between biological processes and assessment data, invalidating error calculations.
+Natural mortality (M) files must start at age 0. Any offset in age indexing will cause misalignment between biological processes and assessment data, leading to error calculations.
 
 Missing values in all configuration files **must be encoded as NAN**, not NA. ALADYM is not NA-aware. Using NA leads to type coercion, failed reads, or numerical propagation of missing values - NAN is explicitly handled by the model and by the tuning scripts.
 
@@ -162,7 +161,7 @@ csv_ex <- read.csv("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_tutoria
 
 csv_ex[is.na(csv_ex)] <- ""
 
-head(csv_ex)
+head(csv_ex, 10)
 
 cat('Example ALADYM configuration file.')
 
@@ -276,41 +275,79 @@ Once `ALADYM_tuning_main_config.R` has completed execution, no further manual ed
 
 ## Running the Tr–Fbar tuning
 
-Before launching the tuning procedure, the assessment reference files must already be available. These files are derived from the landings and assessment datasets that have been previously converted into ALADYM-compatible format. No conversion or preprocessing of assessment data is performed at this stage: the tuning procedure assumes that the assessment SSB, Fbar, and catch time series are already present and correctly formatted.
+Once all Tr–Fbar configuration files have been generated, the tuning phase is launched by clicking on the _source_ button in the file
 
-Once all Tr–Fbar–specific configuration files have been generated, the tuning phase is launched using:
+`ALADYM_tuning.R`.
 
-`ALADYM_tuning.R`
+This script operates the full calibration workflow. It iterates sequentially over all Tr–Fbar configuration files created in the previous step by launching ALADYM in batch mode for each configuration without requiring user interaction.
 
-This script orchestrates the full calibration workflow. It iterates sequentially over all Tr–Fbar configuration files created in the previous step and launches ALADYM in batch mode for each configuration without requiring user interaction.
-
-For every Tr–Fbar combination, the script extracts annual time series of spawning stock biomass (SSB), Fbar, and total catch from the ALADYM outputs. These simulated quantities are then compared against the corresponding assessment data. Relative errors are computed, and a scalar score is calculated for each combination as the sum of mean squared relative errors across all indicators.
+For every Tr–Fbar combination, the script extracts annual time series of spawning stock biomass (SSB), Fbar, and total catch from the ALADYM outputs, which are then compared against the corresponding assessment data. Relative errors are computed, and a scalar score is calculated for each combination as the sum of mean squared relative errors across all indicators (see next section).
 
 ## Outputs and diagnostics
 
-All results are accumulated into a single calibration table that links each Tr–Fbar combination to its diagnostic metrics and overall score. In parallel, the script creates a dedicated output folder for each parameter combination. Each folder contains the full set of diagnostic plots and intermediate results associated with that specific run, allowing post hoc inspection of individual simulations.
+The calibration score is defined as the sum of mean squared relative errors between simulated and assessment time series for SSB, Fbar, and total catch. For each indicator $X$, the relative error is computed as
+
+$$
+Err_t = \frac{X_t^{sim} - X_t^{obs}}{X_t^{sim}},
+$$
+and the total score is
+
+$$
+Score = \frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2 + \frac{1}{T} \sum_{t=1}^T (Err_t^{Fbar})^2 + \frac{1}{T} \sum_{t=1}^T (Err_t^{Catch})^2. 
+$$
+The use of squared relative errors ensures scale-independence across indicators with different magnitudes and penalises large deviations more strongly than small ones.
+
+All results are accumulated into a single calibration table that links each Tr–Fbar combination to its diagnostic metrics and overall score, found in the `Combo_runs_diagnostics` folder.
+
+
+<p align="center">
+  <img src="calibration_table.png" width="60%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 2 - Calibration table.
+</div>')
+
+```
+
+In parallel, the script creates a dedicated output folder for each parameter combination. Each folder contains the full set of diagnostic plots and intermediate results associated with that specific run, allowing post hoc inspection of individual simulations.
 
 At the end of the tuning process, the script identifies the Tr–Fbar combination with the lowest total score. This best-performing configuration is recorded in a plain text file that reports the selected Tr value, Fbar age range, and associated score. In addition, two summary output directories are produced: one containing the diagnostics for all tested combinations, and a second containing only the diagnostics associated with the best-performing configuration.
 
-All output folders and files generated by ALADYM_tuning.R are written to the same directory in which the tuning script resides. No automatic cleanup is performed. To maintain an organised project structure, it is recommended to manually create a species-specific folder and move all tuning outputs into that location once the procedure has completed.
+<p align="center">
+  <img src="AL_tutorial_diagnostics_folders.png" width="80%">
+</p>
 
-For each Tr–Fbar combination, ALADYM outputs are saved in a dedicated folder named after the parameter combination. These folders contain the extracted annual time series used for calibration.
+```{r, echo=FALSE, results='asis', message=FALSE}
 
-** ADD EXAMPLE FOLDER NAME **
+library(knitr)
+library(kableExtra)
 
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 3 - Example of folders and files created after ALADYM tuning is complete.
+</div>')
 
-In addition, the tuning script produces:
+```
 
-- a summary table of errors and scores for all combinations,
+All output folders and files generated by `ALADYM_tuning.R` are written to the same directory in which the tuning script lives. No automatic cleanup is performed. To maintain an organised project structure, it is recommended to manually create a species-specific folder and move all tuning outputs into that location once the procedure has completed, as shown below:
 
-- diagnostic plots comparing simulations to assessment data,
+<p align="center">
+  <img src="cleanup_folder.png" width="80%">
+</p>
 
-- highlighted plots for the best-performing Tr–Fbar combination.
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
 
-These outputs allow both quantitative comparison and visual inspection of model behaviour across the explored parameter space.
-
-This concludes the Tr–Fbar tuning stage. Subsequent tuning steps, such as selectivity calibration, build directly on the optimal Tr–Fbar configuration identified here.
-
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 4 - Example of species-specific folders to cleanup the repository.
+</div>')
+```
 
 # Selectivity tuning
 
