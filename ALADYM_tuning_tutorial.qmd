@@ -104,6 +104,28 @@ Installation of BEMTOOL and ALADYM must be completed following that guide before
 
 # How to install ALADYM tuning
 
+To install:
+
+1. Ensure BEMTOOL and ALADYM are already installed and functioning.
+
+2. Download the tuning repository from GitHub, either by:
+
+    - cloning with git clone <repository_link>, or
+
+    - downloading the repository as a ZIP file and extracting it.
+
+3. Place the downloaded folder in a working directory of your choice (it does not need to overwrite BEMTOOL).
+
+4. Open R or RStudio.
+
+5. Set the working directory to the root of the tuning repository.
+
+6. Open ALADYM_tuning.R (or the selectivity tuning script).
+
+7. After generating the configuration files with the provided main configuration script, run the tuning by executing source("ALADYM_tuning.R").
+
+The tuning scripts assume that BEMTOOL is already correctly configured and that ALADYM can run in batch mode. No additional installation steps are required beyond placing the repository locally and ensuring that internal source paths match the local BEMTOOL directory structure.
+
 # Overview of the tuning workflow
 
 The tuning process follows a fixed and sequential workflow designed to ensure consistency and reproducibility across all simulations. First, the user defines the ranges of the parameters to be explored, specifying the discrete values that will be tested during calibration. Based on these ranges, the tuning scripts automatically generate multiple ALADYM configuration files, each representing a unique parameter combination derived from the baseline setup.
@@ -134,6 +156,34 @@ Specifically, the tuning process is a two-stage process. In **Stage 1**, the bio
 
 Note that the stages are executed sequentially, not jointly.
 
+# Data preparation
+
+BEMTOOL operates in a multi-species, multi-fleet framework where landings, effort and biological inputs can coexist within a common modelling structure. ALADYM, in contrast, is species-specific. Each ALADYM run represents a single stock, even if multiple fleet segments exploit it. This structural difference has direct implications for input data preparation.
+
+For ALADYM tuning, landings and effort files must be provided separately for each species. Even if the same fleet segments operate across species, the corresponding catch-at-age, total landings, effort series and biological parameters must be organised in species-dedicated input files. A configuration prepared for European hake cannot be reused directly for red mullet or deep-water rose shrimp, because growth, mortality, maturity and selectivity structures are stock-dependent.
+
+Consequently:
+
+Each species requires its own ALADYM configuration file.
+
+Each species requires its own landings and effort input files formatted according to ALADYM specifications.
+
+Biological inputs (e.g. M-at-age, growth parameters, maturity ogives, selectivity) must be species-specific.
+
+Assessment reference files (e.g. SSB, Fbar, catch time series) must correspond to the same stock and spatial unit.
+
+The required Excel templates and example input files are provided in the distributed package. These files illustrate the correct ALADYM format and differ from the standard BEMTOOL input structure. Users should not attempt to reuse BEMTOOL landings files directly without restructuring them into the species-specific ALADYM format.
+
+In practice, this means that tuning must be conducted separately for each stock. The workflow—generation of configurations, automated batch runs, score computation and diagnostics—remains identical, but all input data must be prepared independently for each species.
+
+<a href="data/effort.csv" download>
+Effort csv example
+</a>
+
+<a href="data/production.csv" download>
+Production csv example
+</a>
+
 # Tr-Fbar tuning
 
 The _Tr–Fbar_ tuning explores alternative combinations of the recruitment timing parameter _Tr_ and the age range used to compute mean fishing mortality _Fbar_. All other biological and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.
@@ -142,7 +192,6 @@ The _Tr–Fbar_ tuning explores alternative combinations of the recruitment timi
 
 After installation of the ALADYM tuning software, a baseline ALADYM configuration must be prepared. This baseline configuration is the structural reference from which all tuning combinations are generated. Every Tr–Fbar configuration produced by the tuning scripts is a direct modification of this baseline. 
 
-
 Several constraints are critical.
 
 Natural mortality (M) files must start at age 0. Any offset in age indexing will cause misalignment between biological processes and assessment data, leading to error calculations.
@@ -150,14 +199,14 @@ Natural mortality (M) files must start at age 0. Any offset in age indexing will
 Missing values in all configuration files **must be encoded as NAN**, not NA. ALADYM is not NA-aware. Using NA leads to type coercion, failed reads, or numerical propagation of missing values - NAN is explicitly handled by the model and by the tuning scripts.
 
 The ALADYM configuration file used here is not the same as the BEMTOOL configuration file. BEMTOOL wraps ALADYM but applies additional preprocessing and abstractions. The tuning workflow operates directly on ALADYM inputs. A template ALADYM configuration file adapted for tuning is provided
-<a href="aladym_config.csv" download>
+<a href="data/aladym_config.csv" download>
 here.
 </a>
  
 
 ```{r, echo=FALSE, results='markup', message=FALSE}
 
-csv_ex <- read.csv("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_tutorial\\aladym_config.csv", sep = ';', header = TRUE)
+csv_ex <- read.csv("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_tutorial\\data\\aladym_config.csv", sep = ';', header = TRUE)
 
 csv_ex[is.na(csv_ex)] <- ""
 
