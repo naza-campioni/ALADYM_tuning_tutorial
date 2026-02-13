@@ -93,7 +93,6 @@ The tuning framework is designed to be used after a standard BEMTOOL/ALADYM setu
 
 - assessment outputs (SSB, Fbar, catches) are available as reference series.
 
-
 This tuning module is not a replacement for the standard BEMTOOL workflow. It is a calibration step intended to improve the biological consistency of ALADYM before running management or bioeconomic scenarios. No knowledge of BEMTOOL’s economic or management scenario modules is required to apply the tuning, in that only ALADYM parameters are tuned.
 
 The approach is a structured grid search: no optimisation algorithm is employed. The procedure is diagnostic and comparative, not predictive.
@@ -104,27 +103,75 @@ Installation of BEMTOOL and ALADYM must be completed following that guide before
 
 # How to install ALADYM tuning
 
-To install:
+## Installation and setup of the tuning framework
 
-1. Ensure BEMTOOL and ALADYM are already installed and functioning.
+The tuning workflow is distributed as a collection of `R` scripts, including the main execution files and the utility scripts responsible for generating configuration files. All these scripts must be downloaded together from the GitHub repository:
 
-2. Download the tuning repository from GitHub, either by:
+**ADD REPOSITORY HERE**
 
-    - cloning with git clone <repository_link>, or
+The repository contains:
 
-    - downloading the repository as a ZIP file and extracting it.
+- the Tr–Fbar tuning script,
 
-3. Place the downloaded folder in a working directory of your choice (it does not need to overwrite BEMTOOL).
+- the selectivity tuning script,
 
-4. Open R or RStudio.
+- utility scripts used to create and modify configuration files (e.g. mortality adjustments, age regrouping, configuration writers).
 
-5. Set the working directory to the root of the tuning repository.
+After downloading or cloning the repository, open the configuration-generation scripts, `ALADYM_tuning_main_config.R` and `ALADYM_tuning_selectivity_main_script.R`, and update the internal `source()` paths so that they point to the correct local location of the utility scripts.
 
-6. Open ALADYM_tuning.R (or the selectivity tuning script).
+That is, replace hard-coded paths
 
-7. After generating the configuration files with the provided main configuration script, run the tuning by executing source("ALADYM_tuning.R").
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#| eval: false
+source("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_utils\\adjust_M_wrt_tr.R")
+source("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_utils\\age_split_Fbar.R")
+source("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_utils\\tuning_config_creation.R")
+```
 
-The tuning scripts assume that BEMTOOL is already correctly configured and that ALADYM can run in batch mode. No additional installation steps are required beyond placing the repository locally and ensuring that internal source paths match the local BEMTOOL directory structure.
+and
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#| eval: false
+
+source("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_selectivity_utils\\create_sel_combinations.R")
+source("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_selectivity_utils\\create_sel_configs.R")
+```
+
+with paths corresponding to your local directory structure, for example:
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+#| eval: false
+source("path/to/your/repository/utils/adjust_M_wrt_tr.R")
+source("path/to/your/repository/utils/age_split_Fbar.R")
+source("path/to/your/repository/utils/tuning_config_creation.R")
+```
+
+All utility scripts must be reachable from the main script via correct relative or absolute paths. If these paths are not updated, configuration files will not be generated correctly.
+
+## Installation procedure
+
+Before using the tuning framework, BEMTOOL must already be installed and fully operational.
+
+To install the tuning framework:
+
+- Download the GitHub repository either by cloning it using
+git clone <repository_link>
+or by downloading the repository as a ZIP archive and extracting it locally.
+
+- Place the extracted folder in a working directory of your choice. The folder does not need to overwrite or replace the BEMTOOL installation; it operates externally.
+
+- Open the main configuration-generation script and ensure all internal source() paths correctly reference the utility scripts.
+
+- Execute the configuration-generation script to create the Tr–Fbar (or selectivity) configuration files.
+
+- Open `ALADYM_tuning.R`, or `ALADYM_tuning_selectivity.R`, and run the calibration procedure by executing:
+
+```{r, echo=TRUE, message=FALSE}
+#| eval: false
+source("ALADYM_tuning.R")
+```
+
+No additional installation steps are required. The tuning scripts rely on the existing BEMTOOL/ALADYM installation and operate by generating and executing alternative ALADYM configuration files, provided that internal paths are correctly defined.
 
 # Overview of the tuning workflow
 
@@ -164,17 +211,13 @@ For ALADYM tuning, landings and effort files must be provided separately for eac
 
 Consequently:
 
-Each species requires its own ALADYM configuration file.
+- Each species requires its own ALADYM configuration file.
 
-Each species requires its own landings and effort input files formatted according to ALADYM specifications.
+- Each species requires its own landings and effort input files formatted according to ALADYM specifications.
 
-Biological inputs (e.g. M-at-age, growth parameters, maturity ogives, selectivity) must be species-specific.
+- Biological inputs (e.g. M-at-age, growth parameters, maturity ogives, selectivity) must be species-specific.
 
-Assessment reference files (e.g. SSB, Fbar, catch time series) must correspond to the same stock and spatial unit.
-
-The required Excel templates and example input files are provided in the distributed package. These files illustrate the correct ALADYM format and differ from the standard BEMTOOL input structure. Users should not attempt to reuse BEMTOOL landings files directly without restructuring them into the species-specific ALADYM format.
-
-In practice, this means that tuning must be conducted separately for each stock. The workflow—generation of configurations, automated batch runs, score computation and diagnostics—remains identical, but all input data must be prepared independently for each species.
+The required Excel templates and example input files can be found here:
 
 <a href="data/effort.csv" download>
 Effort csv example
@@ -183,6 +226,10 @@ Effort csv example
 <a href="data/production.csv" download>
 Production csv example
 </a>
+
+These files illustrate the correct ALADYM format and differ from the standard BEMTOOL input structure. Users should not attempt to reuse BEMTOOL landings files directly without restructuring them into the species-specific ALADYM format.
+
+In practice, this means that tuning must be conducted separately for each stock. The workflow (generation of configurations, automated batch runs, score computation and diagnostics) remains identical, but all input data must be prepared independently for each species.
 
 # Tr-Fbar tuning
 
@@ -400,43 +447,132 @@ Figure 4 - Example of species-specific folders to cleanup the repository.
 
 # Selectivity tuning
 
-Selectivity tuning is performed only after the Tr–Fbar tuning stage has converged. The optimal Tr–Fbar combination is treated as fixed input. Selectivity tuning explores alternative gear-specific selectivity parameterisations while holding recruitment timing, fishing mortality structure, and all biological parameters constant.
-
-This is a controlled second-stage calibration. The objective is to improve fleet-specific catch dynamics without destabilising stock-level indicators.
+Selectivity tuning is performed only after the Tr–Fbar tuning stage has converged. The optimal Tr–Fbar combination is treated as fixed input. Selectivity tuning explores alternative gear-specific selectivity parameterisations while holding recruitment timing, fishing mortality structure, and all biological parameters constant. The objective is to improve fleet-specific catch dynamics without destabilising stock-level indicators.
 
 ## Input data requirements 
 
-Selectivity is defined at the fleet-segment level. Each fleet is associated with:
-
-- a selectivity type identifier,
-
-- a fixed number of parameter slots (six in the input file),
-
-- a subset of those parameters actually used, depending on the selectivity type.
-
-The selectivity input file is rectangular by design: all fleets share the same column structure, even if some parameters are unused. Unused parameters must still be present and must be left empty.
-
-## Definition of parameter ranges
-
-Selectivity tuning is driven by user-defined parameter ranges. For each parameter involved in a given selectivity type, a discrete set of candidate values is specified.
-
-These ranges are defined in R as simple numeric vectors. The tuning scripts do not assume continuity or bounds; they only enumerate combinations.
-
-Only parameters that are active for a given selectivity type are included in the combination space. The remaining parameter slots are left unchanged from the baseline configuration.
+The baseline ALADYM configuration used for selectivity is the same as the one used for the Tr-Fbar tuning with the exception that the Tr and Fbar values must now be set to the identified, best performing Tr-Fbar combination. Consequently, the specified M file should be the one starting at the selected Tr value. Again, we remind that `NA` values must be encoded as `NAN`.
 
 ## Generation of selectivity configurations
 
-Configuration generation is handled by the selectivity tuning scripts. Internally, the process follows three steps:
+Selectivity configuration generation is more structured than Tr–Fbar tuning because BEMTOOL gives the possibility to choose among six functions for selectivity. Each function is associated therefore to a different subset of parameters.
 
-1. The selectivity file is split by fleet segment.
+The tuning framework does not attempt to switch between selectivity functions: the selectivity type for each fleet segment is fixed in the original selectivity Excel file and remains unchanged throughout tuning. What is explored are alternative values of the parameters associated with that specific function. This is handled via
 
-2. For each fleet, all valid parameter combinations are generated using a Cartesian product over the active parameters.
+`ALADYM_tuning_selectivity_main_script.R`.
 
-3. Full-model configurations are created by combining fleet-level parameter choices across fleets.
+The configuration-generation step begins by defining a mapping between selectivity types and the parameters they are allowed to use. This mapping is implemented as a hash map where:
 
-The result is a set of complete ALADYM configurations, each corresponding to one unique multi-fleet selectivity setup. Each configuration modifies only the selectivity file; all other inputs remain identical to the optimal Tr–Fbar baseline.
+- Each key represents a selectivity type identifier.
 
-Configuration folders are named systematically to encode the selectivity parameter combination. This naming is later used to aggregate results and compute scores.
+- Each value is the set of parameter names that are active for that function.
+
+
+```{r, echo=TRUE, results='asis', message=FALSE}
+#| eval: false
+
+library(hash)
+
+# -----------------------------------------------------
+# Define selectivity dictionary:
+# maps selectivity type -> parameters used
+# -----------------------------------------------------
+selectivity_id <- hash()
+selectivity_id[["1"]] <- list(c("param1", "param2"), c(1, 2))
+selectivity_id[["2"]] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
+selectivity_id[["3"]] <- list(c("param1", "param2"), c(1, 2))
+selectivity_id[["4"]] <- list(c("param1", "param2"), c(1, 2))
+selectivity_id[["5"]] <- list(c("param1", "param2", "param3", "param4", "param5"),
+                              c(1, 2, 3, 4, 5))
+selectivity_id[["6"]] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
+
+# -----------------------------------------------------
+# Define selectivity parameters combinations per selectivity type
+# -----------------------------------------------------
+# sel 1
+p11 <- c(10, 15, 20) #seq(15, 20)
+p12 <- c(5, 6) #seq(3, 7)
+
+# sel 2
+p21 <- c(10, 15)
+p22 <- c(7, 8)
+p23 <- c(8, 10)
+
+# sel 3
+p31 <- c(20, 25)
+p32 <- c(10, 15)
+
+# sel 4
+p41 <- c(12, 25)
+p42 <- c(6, 7)
+p43 <- c(7, 8)
+
+# sel 5
+p51 <- c(12, 25)
+p52 <- c(12, 25)
+p53 <- c(12, 25)
+p54 <- c(12, 25)
+p55 <- c(12, 25)
+
+# sel 6
+p61 <- c(12, 25)
+p62 <- c(10, 20)
+p63 <- c(15, 15)
+
+
+# per-selectivity-type parameters
+params_sel <- hash()
+params_sel[["1"]] <- list(p11, p12)
+params_sel[['2']] <- list(p21, p22, p23)
+params_sel[['3']] <- list(p31, p32)
+params_sel[['4']] <- list(p41, p42, p43)
+params_sel[['5']] <- list(p51, p52, p53, p54, p55)
+params_sel[['6']] <- list(p61, p62, p63)
+
+
+```
+
+```{r, message=FALSE, echo=FALSE}
+cat('Example of how to specify the selectivity parameters range to use in the creation of different ALADYM configuration files.')
+```
+
+For example, a logistic function may allow only an inflection age and a slope parameter, whereas a dome-shaped function may allow parameters controlling peak age and curvature. Although the input file contains a fixed number of parameter columns, only the parameters listed in the mapping for the selected type are considered active. The remaining parameter slots are ignored during combination generation and remain fixed at their baseline values.
+
+During configuration creation, the script performs the following sequence:
+
+1. It reads the baseline selectivity file and identifies, for each fleet, the assigned selectivity type.
+
+2. For each fleet, it retrieves from the hash map the subset of parameters that are valid for that type.
+
+3. It generates all combinations of the user-defined ranges only for those active parameters.
+
+4. It reconstructs full selectivity files by substituting alternative parameter values fleet by fleet, while keeping:
+
+    - the selectivity type unchanged,
+
+    - all non-active parameters fixed,
+
+    - all other fleets’ parameters unchanged unless explicitly varied.
+
+The result is a set of complete selectivity configuration files in which every fleet retains its original functional form, and only the allowed parameters are varied. Combinations are therefore selectivity-type-specific and fleet-specific. This structure guarantees that a fleet assigned a logistic function will never receive parameters belonging to a dome-shaped function, and no configuration will mix parameter sets incompatible with the declared selectivity type.
+
+Following the remaining steps of `ALADYM_tuning_selectivity_main_script.R` will create two folders: one folder named `selectivity_combinations` containing all combinations of the selectivity-specific parameters is created within the specified species folder, whereas the folder of configurations that specify the path of each selectivity file is created in the folder `selectivity_configs_SPE`, as shown below.
+
+<p align="center">
+  <img src="selectivity_folders.png" width="80%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 5 - Example of selectivity configurations output folders.
+</div>')
+```
+
+These files are then used in batch mode by the selectivity tuning script, which evaluates their performance against stock- and fleet-level observations.
+
 
 ## Running selectivity tuning
 

@@ -234,7 +234,11 @@ window.Quarto = {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#how-to-install-aladym-tuning" id="toc-how-to-install-aladym-tuning" class="nav-link" data-scroll-target="#how-to-install-aladym-tuning">How to install ALADYM tuning</a></li>
+  <li><a href="#how-to-install-aladym-tuning" id="toc-how-to-install-aladym-tuning" class="nav-link" data-scroll-target="#how-to-install-aladym-tuning">How to install ALADYM tuning</a>
+  <ul>
+  <li><a href="#installation-and-setup-of-the-tuning-framework" id="toc-installation-and-setup-of-the-tuning-framework" class="nav-link" data-scroll-target="#installation-and-setup-of-the-tuning-framework">Installation and setup of the tuning framework</a></li>
+  <li><a href="#installation-procedure" id="toc-installation-procedure" class="nav-link" data-scroll-target="#installation-procedure">Installation procedure</a></li>
+  </ul></li>
   <li><a href="#overview-of-the-tuning-workflow" id="toc-overview-of-the-tuning-workflow" class="nav-link" data-scroll-target="#overview-of-the-tuning-workflow">Overview of the tuning workflow</a></li>
   <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data preparation</a></li>
   <li><a href="#tr-fbar-tuning" id="toc-tr-fbar-tuning" class="nav-link" data-scroll-target="#tr-fbar-tuning">Tr-Fbar tuning</a>
@@ -247,7 +251,6 @@ window.Quarto = {
   <li><a href="#selectivity-tuning" id="toc-selectivity-tuning" class="nav-link" data-scroll-target="#selectivity-tuning">Selectivity tuning</a>
   <ul>
   <li><a href="#input-data-requirements-1" id="toc-input-data-requirements-1" class="nav-link" data-scroll-target="#input-data-requirements-1">Input data requirements</a></li>
-  <li><a href="#definition-of-parameter-ranges" id="toc-definition-of-parameter-ranges" class="nav-link" data-scroll-target="#definition-of-parameter-ranges">Definition of parameter ranges</a></li>
   <li><a href="#generation-of-selectivity-configurations" id="toc-generation-of-selectivity-configurations" class="nav-link" data-scroll-target="#generation-of-selectivity-configurations">Generation of selectivity configurations</a></li>
   <li><a href="#running-selectivity-tuning" id="toc-running-selectivity-tuning" class="nav-link" data-scroll-target="#running-selectivity-tuning">Running selectivity tuning</a></li>
   <li><a href="#outputs-and-diagnostics-1" id="toc-outputs-and-diagnostics-1" class="nav-link" data-scroll-target="#outputs-and-diagnostics-1">Outputs and diagnostics</a></li>
@@ -356,21 +359,52 @@ document.addEventListener("DOMContentLoaded", function(){
 </section>
 <section id="how-to-install-aladym-tuning" class="level1">
 <h1>How to install ALADYM tuning</h1>
-<p>To install:</p>
-<ol type="1">
-<li><p>Ensure BEMTOOL and ALADYM are already installed and functioning.</p></li>
-<li><p>Download the tuning repository from GitHub, either by:</p>
+<section id="installation-and-setup-of-the-tuning-framework" class="level2">
+<h2 class="anchored" data-anchor-id="installation-and-setup-of-the-tuning-framework">Installation and setup of the tuning framework</h2>
+<p>The tuning workflow is distributed as a collection of <code>R</code> scripts, including the main execution files and the utility scripts responsible for generating configuration files. All these scripts must be downloaded together from the GitHub repository:</p>
+<p><strong>ADD REPOSITORY HERE</strong></p>
+<p>The repository contains:</p>
 <ul>
-<li><p>cloning with git clone <repository_link>, or</repository_link></p></li>
-<li><p>downloading the repository as a ZIP file and extracting it.</p></li>
-</ul></li>
-<li><p>Place the downloaded folder in a working directory of your choice (it does not need to overwrite BEMTOOL).</p></li>
-<li><p>Open R or RStudio.</p></li>
-<li><p>Set the working directory to the root of the tuning repository.</p></li>
-<li><p>Open ALADYM_tuning.R (or the selectivity tuning script).</p></li>
-<li><p>After generating the configuration files with the provided main configuration script, run the tuning by executing source(“ALADYM_tuning.R”).</p></li>
-</ol>
-<p>The tuning scripts assume that BEMTOOL is already correctly configured and that ALADYM can run in batch mode. No additional installation steps are required beyond placing the repository locally and ensuring that internal source paths match the local BEMTOOL directory structure.</p>
+<li><p>the Tr–Fbar tuning script,</p></li>
+<li><p>the selectivity tuning script,</p></li>
+<li><p>utility scripts used to create and modify configuration files (e.g.&nbsp;mortality adjustments, age regrouping, configuration writers).</p></li>
+</ul>
+<p>After downloading or cloning the repository, open the configuration-generation scripts, <code>ALADYM_tuning_main_config.R</code> and <code>ALADYM_tuning_selectivity_main_script.R</code>, and update the internal <code>source()</code> paths so that they point to the correct local location of the utility scripts.</p>
+<p>That is, replace hard-coded paths</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">Nazareno Campioni</span><span class="sc">\\</span><span class="st">Desktop</span><span class="sc">\\</span><span class="st">ALADYM_tuning_utils</span><span class="sc">\\</span><span class="st">adjust_M_wrt_tr.R"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">Nazareno Campioni</span><span class="sc">\\</span><span class="st">Desktop</span><span class="sc">\\</span><span class="st">ALADYM_tuning_utils</span><span class="sc">\\</span><span class="st">age_split_Fbar.R"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">Nazareno Campioni</span><span class="sc">\\</span><span class="st">Desktop</span><span class="sc">\\</span><span class="st">ALADYM_tuning_utils</span><span class="sc">\\</span><span class="st">tuning_config_creation.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>and</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">Nazareno Campioni</span><span class="sc">\\</span><span class="st">Desktop</span><span class="sc">\\</span><span class="st">ALADYM_tuning_selectivity_utils</span><span class="sc">\\</span><span class="st">create_sel_combinations.R"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">Nazareno Campioni</span><span class="sc">\\</span><span class="st">Desktop</span><span class="sc">\\</span><span class="st">ALADYM_tuning_selectivity_utils</span><span class="sc">\\</span><span class="st">create_sel_configs.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>with paths corresponding to your local directory structure, for example:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"path/to/your/repository/utils/adjust_M_wrt_tr.R"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"path/to/your/repository/utils/age_split_Fbar.R"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"path/to/your/repository/utils/tuning_config_creation.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>All utility scripts must be reachable from the main script via correct relative or absolute paths. If these paths are not updated, configuration files will not be generated correctly.</p>
+</section>
+<section id="installation-procedure" class="level2">
+<h2 class="anchored" data-anchor-id="installation-procedure">Installation procedure</h2>
+<p>Before using the tuning framework, BEMTOOL must already be installed and fully operational.</p>
+<p>To install the tuning framework:</p>
+<ul>
+<li><p>Download the GitHub repository either by cloning it using git clone <repository_link> or by downloading the repository as a ZIP archive and extracting it locally.</repository_link></p></li>
+<li><p>Place the extracted folder in a working directory of your choice. The folder does not need to overwrite or replace the BEMTOOL installation; it operates externally.</p></li>
+<li><p>Open the main configuration-generation script and ensure all internal source() paths correctly reference the utility scripts.</p></li>
+<li><p>Execute the configuration-generation script to create the Tr–Fbar (or selectivity) configuration files.</p></li>
+<li><p>Open <code>ALADYM_tuning.R</code>, or <code>ALADYM_tuning_selectivity.R</code>, and run the calibration procedure by executing:</p></li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"ALADYM_tuning.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>No additional installation steps are required. The tuning scripts rely on the existing BEMTOOL/ALADYM installation and operate by generating and executing alternative ALADYM configuration files, provided that internal paths are correctly defined.</p>
+</section>
 </section>
 <section id="overview-of-the-tuning-workflow" class="level1">
 <h1>Overview of the tuning workflow</h1>
@@ -392,14 +426,16 @@ document.addEventListener("DOMContentLoaded", function(){
 <p>BEMTOOL operates in a multi-species, multi-fleet framework where landings, effort and biological inputs can coexist within a common modelling structure. ALADYM, in contrast, is species-specific. Each ALADYM run represents a single stock, even if multiple fleet segments exploit it. This structural difference has direct implications for input data preparation.</p>
 <p>For ALADYM tuning, landings and effort files must be provided separately for each species. Even if the same fleet segments operate across species, the corresponding catch-at-age, total landings, effort series and biological parameters must be organised in species-dedicated input files. A configuration prepared for European hake cannot be reused directly for red mullet or deep-water rose shrimp, because growth, mortality, maturity and selectivity structures are stock-dependent.</p>
 <p>Consequently:</p>
-<p>Each species requires its own ALADYM configuration file.</p>
-<p>Each species requires its own landings and effort input files formatted according to ALADYM specifications.</p>
-<p>Biological inputs (e.g.&nbsp;M-at-age, growth parameters, maturity ogives, selectivity) must be species-specific.</p>
-<p>Assessment reference files (e.g.&nbsp;SSB, Fbar, catch time series) must correspond to the same stock and spatial unit.</p>
-<p>The required Excel templates and example input files are provided in the distributed package. These files illustrate the correct ALADYM format and differ from the standard BEMTOOL input structure. Users should not attempt to reuse BEMTOOL landings files directly without restructuring them into the species-specific ALADYM format.</p>
-<p>In practice, this means that tuning must be conducted separately for each stock. The workflow—generation of configurations, automated batch runs, score computation and diagnostics—remains identical, but all input data must be prepared independently for each species.</p>
+<ul>
+<li><p>Each species requires its own ALADYM configuration file.</p></li>
+<li><p>Each species requires its own landings and effort input files formatted according to ALADYM specifications.</p></li>
+<li><p>Biological inputs (e.g.&nbsp;M-at-age, growth parameters, maturity ogives, selectivity) must be species-specific.</p></li>
+</ul>
+<p>The required Excel templates and example input files can be found here:</p>
 <p><a href="data/effort.csv" download=""> Effort csv example </a></p>
 <p><a href="data/production.csv" download=""> Production csv example </a></p>
+<p>These files illustrate the correct ALADYM format and differ from the standard BEMTOOL input structure. Users should not attempt to reuse BEMTOOL landings files directly without restructuring them into the species-specific ALADYM format.</p>
+<p>In practice, this means that tuning must be conducted separately for each stock. The workflow (generation of configurations, automated batch runs, score computation and diagnostics) remains identical, but all input data must be prepared independently for each species.</p>
 </section>
 <section id="tr-fbar-tuning" class="level1">
 <h1>Tr-Fbar tuning</h1>
@@ -445,59 +481,59 @@ document.addEventListener("DOMContentLoaded", function(){
 <li><p>Species-specific M and F input files must be stored in <code>C:\INPUT\ALADYM\species_folder</code>.</p></li>
 </ol>
 <p>If fishing mortality at age files are not available, the parameters <strong>F_at_age_F</strong> and <strong>F_at_age_M</strong> must be set to “None” in the baseline configuration. In this case, an <strong>Fbar_assessment</strong> file must be provided. All Z values will then be computed internally from the Fbar assessment data for each Tr–Fbar combination. This can be seen in the following example code.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## paths</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># input path - main folder where we can find M, F and config_file</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>ip <span class="ot">&lt;-</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">INPUT</span><span class="sc">\\</span><span class="st">ALADYM"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># output path - where you want to save the output (usually C:\INPUT\ALADYM)</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">INPUT</span><span class="sc">\\</span><span class="st">ALADYM"</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># species folder - used for M and F files</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>species_folder <span class="ot">&lt;-</span> <span class="st">"MUT1718"</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># are there different M files for males and females?</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>M_different <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="do">## set the M files names -&gt; make sure these start from age = 0 </span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># sex-specific files?</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>M_male <span class="ot">&lt;-</span> <span class="st">"M_MUT_M.csv"</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>M_female <span class="ot">&lt;-</span> <span class="st">"M_MUT_F.csv"</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># instead, if they have the same file:</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>M_file <span class="ot">&lt;-</span> <span class="st">"M_MUT.csv"</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="do">## if F_at_age files exist</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>F_at_age_M <span class="ot">&lt;-</span> <span class="st">"F_at_age_MUT_M.csv"</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>F_at_age_F <span class="ot">&lt;-</span> <span class="st">"F_at_age_MUT_F.csv"</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>Fbar_assessment <span class="ot">&lt;-</span> <span class="st">"None"</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co"># otherwise, if there is only an Fbar file coming from the assessment</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># F_at_age_M &lt;- "None"</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># F_at_age_F &lt;- "None</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Fbar_assessment &lt;- "Fbar_assessment_MUT.csv"</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="do">## set initial configuration file -&gt; must live in C:\INPUT\ALADYM</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="do">## make sure that NA values are specified as NAN (needed for the splitting)</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>configuration <span class="ot">&lt;-</span> <span class="st">"aladym_MUT_GSA17_18.csv"</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="do">## set tr</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>tr <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="do">## set F_range over which to calculate Fbar, eg: list(c(0,3),c(1,4))</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co"># if you only have Fbar from assessment, set F_range = None</span></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>F_range <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>),<span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">5</span>))</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co"># F_range = "None"</span></span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="do">## time series</span></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">2004</span><span class="sc">:</span><span class="dv">2024</span>)</span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="do">## species</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>spe <span class="ot">=</span> <span class="st">'MUT'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## paths</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># input path - main folder where we can find M, F and config_file</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ip <span class="ot">&lt;-</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">INPUT</span><span class="sc">\\</span><span class="st">ALADYM"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># output path - where you want to save the output (usually C:\INPUT\ALADYM)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">INPUT</span><span class="sc">\\</span><span class="st">ALADYM"</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># species folder - used for M and F files</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>species_folder <span class="ot">&lt;-</span> <span class="st">"MUT1718"</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># are there different M files for males and females?</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>M_different <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="do">## set the M files names -&gt; make sure these start from age = 0 </span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># sex-specific files?</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>M_male <span class="ot">&lt;-</span> <span class="st">"M_MUT_M.csv"</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>M_female <span class="ot">&lt;-</span> <span class="st">"M_MUT_F.csv"</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># instead, if they have the same file:</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>M_file <span class="ot">&lt;-</span> <span class="st">"M_MUT.csv"</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="do">## if F_at_age files exist</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>F_at_age_M <span class="ot">&lt;-</span> <span class="st">"F_at_age_MUT_M.csv"</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>F_at_age_F <span class="ot">&lt;-</span> <span class="st">"F_at_age_MUT_F.csv"</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>Fbar_assessment <span class="ot">&lt;-</span> <span class="st">"None"</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># otherwise, if there is only an Fbar file coming from the assessment</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co"># F_at_age_M &lt;- "None"</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co"># F_at_age_F &lt;- "None</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Fbar_assessment &lt;- "Fbar_assessment_MUT.csv"</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="do">## set initial configuration file -&gt; must live in C:\INPUT\ALADYM</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="do">## make sure that NA values are specified as NAN (needed for the splitting)</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>configuration <span class="ot">&lt;-</span> <span class="st">"aladym_MUT_GSA17_18.csv"</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="do">## set tr</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>tr <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="do">## set F_range over which to calculate Fbar, eg: list(c(0,3),c(1,4))</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co"># if you only have Fbar from assessment, set F_range = None</span></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>F_range <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>),<span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">5</span>))</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co"># F_range = "None"</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="do">## time series</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">2004</span><span class="sc">:</span><span class="dv">2024</span>)</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="do">## species</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>spe <span class="ot">=</span> <span class="st">'MUT'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Example of input paths for the creation of different ALADYM configuration files.</code></pre>
@@ -553,34 +589,105 @@ Score = \frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2 + \frac{1}{T} \sum_{t=1}^T (Err
 </section>
 <section id="selectivity-tuning" class="level1">
 <h1>Selectivity tuning</h1>
-<p>Selectivity tuning is performed only after the Tr–Fbar tuning stage has converged. The optimal Tr–Fbar combination is treated as fixed input. Selectivity tuning explores alternative gear-specific selectivity parameterisations while holding recruitment timing, fishing mortality structure, and all biological parameters constant.</p>
-<p>This is a controlled second-stage calibration. The objective is to improve fleet-specific catch dynamics without destabilising stock-level indicators.</p>
+<p>Selectivity tuning is performed only after the Tr–Fbar tuning stage has converged. The optimal Tr–Fbar combination is treated as fixed input. Selectivity tuning explores alternative gear-specific selectivity parameterisations while holding recruitment timing, fishing mortality structure, and all biological parameters constant. The objective is to improve fleet-specific catch dynamics without destabilising stock-level indicators.</p>
 <section id="input-data-requirements-1" class="level2">
 <h2 class="anchored" data-anchor-id="input-data-requirements-1">Input data requirements</h2>
-<p>Selectivity is defined at the fleet-segment level. Each fleet is associated with:</p>
-<ul>
-<li><p>a selectivity type identifier,</p></li>
-<li><p>a fixed number of parameter slots (six in the input file),</p></li>
-<li><p>a subset of those parameters actually used, depending on the selectivity type.</p></li>
-</ul>
-<p>The selectivity input file is rectangular by design: all fleets share the same column structure, even if some parameters are unused. Unused parameters must still be present and must be left empty.</p>
-</section>
-<section id="definition-of-parameter-ranges" class="level2">
-<h2 class="anchored" data-anchor-id="definition-of-parameter-ranges">Definition of parameter ranges</h2>
-<p>Selectivity tuning is driven by user-defined parameter ranges. For each parameter involved in a given selectivity type, a discrete set of candidate values is specified.</p>
-<p>These ranges are defined in R as simple numeric vectors. The tuning scripts do not assume continuity or bounds; they only enumerate combinations.</p>
-<p>Only parameters that are active for a given selectivity type are included in the combination space. The remaining parameter slots are left unchanged from the baseline configuration.</p>
+<p>The baseline ALADYM configuration used for selectivity is the same as the one used for the Tr-Fbar tuning with the exception that the Tr and Fbar values must now be set to the identified, best performing Tr-Fbar combination. Consequently, the specified M file should be the one starting at the selected Tr value. Again, we remind that <code>NA</code> values must be encoded as <code>NAN</code>.</p>
 </section>
 <section id="generation-of-selectivity-configurations" class="level2">
 <h2 class="anchored" data-anchor-id="generation-of-selectivity-configurations">Generation of selectivity configurations</h2>
-<p>Configuration generation is handled by the selectivity tuning scripts. Internally, the process follows three steps:</p>
+<p>Selectivity configuration generation is more structured than Tr–Fbar tuning because BEMTOOL gives the possibility to choose among six functions for selectivity. Each function is associated therefore to a different subset of parameters.</p>
+<p>The tuning framework does not attempt to switch between selectivity functions: the selectivity type for each fleet segment is fixed in the original selectivity Excel file and remains unchanged throughout tuning. What is explored are alternative values of the parameters associated with that specific function. This is handled via</p>
+<p><code>ALADYM_tuning_selectivity_main_script.R</code>.</p>
+<p>The configuration-generation step begins by defining a mapping between selectivity types and the parameters they are allowed to use. This mapping is implemented as a hash map where:</p>
+<ul>
+<li><p>Each key represents a selectivity type identifier.</p></li>
+<li><p>Each value is the set of parameter names that are active for that function.</p></li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hash)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define selectivity dictionary:</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># maps selectivity type -&gt; parameters used</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>selectivity_id <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"1"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"2"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"3"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"4"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"5"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>, <span class="st">"param4"</span>, <span class="st">"param5"</span>),</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"6"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define selectivity parameters combinations per selectivity type</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 1</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>p11 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>) <span class="co">#seq(15, 20)</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>p12 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>) <span class="co">#seq(3, 7)</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 2</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>p21 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>p22 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>p23 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">10</span>)</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 3</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>p31 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>)</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>p32 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 4</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>p41 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>p42 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>p43 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 5</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>p51 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>p52 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>p53 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>p54 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>p55 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 6</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>p61 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>p62 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>)</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>p63 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">15</span>)</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co"># per-selectivity-type parameters</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>params_sel <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">"1"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p11, p12)</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'2'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p21, p22, p23)</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'3'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p31, p32)</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'4'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p41, p42, p43)</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'5'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p51, p52, p53, p54, p55)</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'6'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p61, p62, p63)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Example of how to specify the selectivity parameters range to use in the creation of different ALADYM configuration files.</code></pre>
+</div>
+</div>
+<p>For example, a logistic function may allow only an inflection age and a slope parameter, whereas a dome-shaped function may allow parameters controlling peak age and curvature. Although the input file contains a fixed number of parameter columns, only the parameters listed in the mapping for the selected type are considered active. The remaining parameter slots are ignored during combination generation and remain fixed at their baseline values.</p>
+<p>During configuration creation, the script performs the following sequence:</p>
 <ol type="1">
-<li><p>The selectivity file is split by fleet segment.</p></li>
-<li><p>For each fleet, all valid parameter combinations are generated using a Cartesian product over the active parameters.</p></li>
-<li><p>Full-model configurations are created by combining fleet-level parameter choices across fleets.</p></li>
+<li><p>It reads the baseline selectivity file and identifies, for each fleet, the assigned selectivity type.</p></li>
+<li><p>For each fleet, it retrieves from the hash map the subset of parameters that are valid for that type.</p></li>
+<li><p>It generates all combinations of the user-defined ranges only for those active parameters.</p></li>
+<li><p>It reconstructs full selectivity files by substituting alternative parameter values fleet by fleet, while keeping:</p>
+<ul>
+<li><p>the selectivity type unchanged,</p></li>
+<li><p>all non-active parameters fixed,</p></li>
+<li><p>all other fleets’ parameters unchanged unless explicitly varied.</p></li>
+</ul></li>
 </ol>
-<p>The result is a set of complete ALADYM configurations, each corresponding to one unique multi-fleet selectivity setup. Each configuration modifies only the selectivity file; all other inputs remain identical to the optimal Tr–Fbar baseline.</p>
-<p>Configuration folders are named systematically to encode the selectivity parameter combination. This naming is later used to aggregate results and compute scores.</p>
+<p>The result is a set of complete selectivity configuration files in which every fleet retains its original functional form, and only the allowed parameters are varied. Combinations are therefore selectivity-type-specific and fleet-specific. This structure guarantees that a fleet assigned a logistic function will never receive parameters belonging to a dome-shaped function, and no configuration will mix parameter sets incompatible with the declared selectivity type.</p>
+<p>Following the remaining steps of <code>ALADYM_tuning_selectivity_main_script.R</code> will create two folders: one folder named <code>selectivity_combinations</code> containing all combinations of the selectivity-specific parameters is created within the specified species folder, whereas the folder of configurations that specify the path of each selectivity file is created in the folder <code>selectivity_configs_SPE</code>, as shown below.</p>
+<p align="center">
+<img src="selectivity_folders.png" width="80%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 5 - Example of selectivity configurations output folders.</p>
+</div>
+<p>These files are then used in batch mode by the selectivity tuning script, which evaluates their performance against stock- and fleet-level observations.</p>
 </section>
 <section id="running-selectivity-tuning" class="level2">
 <h2 class="anchored" data-anchor-id="running-selectivity-tuning">Running selectivity tuning</h2>
