@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
   // create logo
   var img = document.createElement("img");
-  img.src = "COISPA_colour.png";   // relative path from Rmd root
+  img.src = "logos/COISPA_colour.png";   // relative path from Rmd root
   img.alt = "COISPA logo";
 
   // insert: wrap replaces h1, then put logo + h1 inside wrap
@@ -59,10 +59,10 @@ document.addEventListener("DOMContentLoaded", function(){
 
 ::: {#header-links}
 <a href="https://www.fondazionecoispa.org/" target="_blank">
-<img src="COISPA_colour.png" width="50" height="22" style="margin-right:6px; vertical-align:middle;"/>
+<img src="logos/COISPA_colour.png" width="50" height="22" style="margin-right:6px; vertical-align:middle;"/>
 COISPA Website </a>
 <a href="https://github.com/COISPA" target="_blank">
-<img src="github.svg" width="20" height="22" style="margin-right:6px; vertical-align:middle;"/>
+<img src="logos/github.svg" width="20" height="22" style="margin-right:6px; vertical-align:middle;"/>
 COISPA Github </a>
 :::
 
@@ -85,7 +85,7 @@ Specifically, the tuning workflow:
 
 This procedure replaces manual, GUI-driven trial-and-error calibration with a deterministic, script-driven process that is fully reproducible and traceable.
 
-The tuning framework is designed to be used after a standard BEMTOOL/ALADYM setup is already functional. It assumes that:
+The tuning framework is designed to be used after a standard BEMTOOL setup is already functional. It assumes that:
 
 - ALADYM runs correctly for a single configuration,
 
@@ -99,25 +99,25 @@ The approach is a structured grid search: no optimisation algorithm is employed.
 
 For a full description of BEMTOOL structure, data requirements, and installation, refer to the official tutorial: [BEMTOOL Tutorial](https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html).
 
-Installation of BEMTOOL and ALADYM must be completed following that guide before attempting any tuning procedure described below.
+Installation of BEMTOOL must be completed following that guide before attempting any tuning procedure described below.
 
 # How to install ALADYM tuning
 
-## Installation and setup of the tuning framework
+The tuning workflow is distributed as a collection of `R` scripts, including the main execution files and the utility scripts responsible for generating configuration files. All these scripts are found in the GitHub repository:
 
-The tuning workflow is distributed as a collection of `R` scripts, including the main execution files and the utility scripts responsible for generating configuration files. All these scripts must be downloaded together from the GitHub repository:
-
-**ADD REPOSITORY HERE**
+[ALADYM tuning repository](https://github.com/naza-campioni/ALADYM-ver.Tuning/tree/main)
 
 The repository contains:
 
-- the Tr–Fbar tuning script,
+- the scripts necessary to run the biological parameters tuning,
 
-- the selectivity tuning script,
+- the scripts necessary to run the selectivity parameters tuning,
 
-- utility scripts used to create and modify configuration files (e.g. mortality adjustments, age regrouping, configuration writers).
+- utility scripts used to create and modify configuration files (e.g. mortality adjustments, age regrouping, selectivity parameters).
 
-After downloading or cloning the repository, open the configuration-generation scripts, `ALADYM_tuning_main_config.R` and `ALADYM_tuning_selectivity_main_script.R`, and update the internal `source()` paths so that they point to the correct local location of the utility scripts.
+Before using the tuning framework, BEMTOOL must already be installed and fully operational.
+
+After downloading or cloning the repository, open the configuration-generation scripts, `ALADYM_tuning_main_config.R` and `ALADYM_tuning_selectivity_main_script.R` from, respectively, `Utils/Biological_tuning` and `Utils/Selectivity_tuning`, and update the internal `source()` paths so that they point to the correct local location of the utility scripts.
 
 That is, replace hard-coded paths
 
@@ -148,30 +148,7 @@ source("path/to/your/repository/utils/tuning_config_creation.R")
 
 All utility scripts must be reachable from the main script via correct relative or absolute paths. If these paths are not updated, configuration files will not be generated correctly.
 
-## Installation procedure
-
-Before using the tuning framework, BEMTOOL must already be installed and fully operational.
-
-To install the tuning framework:
-
-- Download the GitHub repository either by cloning it using
-git clone <repository_link>
-or by downloading the repository as a ZIP archive and extracting it locally.
-
-- Place the extracted folder in a working directory of your choice. The folder does not need to overwrite or replace the BEMTOOL installation; it operates externally.
-
-- Open the main configuration-generation script and ensure all internal source() paths correctly reference the utility scripts.
-
-- Execute the configuration-generation script to create the Tr–Fbar (or selectivity) configuration files.
-
-- Open `ALADYM_tuning.R`, or `ALADYM_tuning_selectivity.R`, and run the calibration procedure by executing:
-
-```{r, echo=TRUE, message=FALSE}
-#| eval: false
-source("ALADYM_tuning.R")
-```
-
-No additional installation steps are required. The tuning scripts rely on the existing BEMTOOL/ALADYM installation and operate by generating and executing alternative ALADYM configuration files, provided that internal paths are correctly defined.
+No additional installation steps are required. The tuning scripts rely on the existing BEMTOOL installation and operate by generating and executing alternative ALADYM configuration files, provided that internal paths are correctly defined.
 
 # Overview of the tuning workflow
 
@@ -185,7 +162,7 @@ The tuning procedure is deliberately restricted to a defined subset of ALADYM bi
 
 
 <p align="center">
-  <img src="fig1.png" width="60%">
+  <img src="figs/fig1.png" width="60%">
 </p>
 
 ```{r, echo=FALSE, results='asis', message=FALSE}
@@ -257,7 +234,13 @@ csv_ex <- read.csv("C:\\Users\\Nazareno Campioni\\Desktop\\ALADYM_tuning_tutoria
 
 csv_ex[is.na(csv_ex)] <- ""
 
-head(csv_ex, 10)
+# head(csv_ex, 10)
+# 
+# print("---")
+# 
+# tail(csv_ex, 10)
+
+csv_ex[50:60,]
 
 cat('Example ALADYM configuration file.')
 
@@ -397,7 +380,7 @@ All results are accumulated into a single calibration table that links each Tr�
 
 
 <p align="center">
-  <img src="calibration_table.png" width="60%">
+  <img src="figs/calibration_table.png" width="60%">
 </p>
 
 ```{r, echo=FALSE, results='asis', message=FALSE}
@@ -416,7 +399,7 @@ In parallel, the script creates a dedicated output folder for each parameter com
 At the end of the tuning process, the script identifies the Tr–Fbar combination with the lowest total score. This best-performing configuration is recorded in a plain text file that reports the selected Tr value, Fbar age range, and associated score. In addition, two summary output directories are produced: one containing the diagnostics for all tested combinations, and a second containing only the diagnostics associated with the best-performing configuration.
 
 <p align="center">
-  <img src="AL_tutorial_diagnostics_folders.png" width="80%">
+  <img src="figs/AL_tutorial_diagnostics_folders.png" width="80%">
 </p>
 
 ```{r, echo=FALSE, results='asis', message=FALSE}
@@ -433,7 +416,7 @@ Figure 3 - Example of folders and files created after ALADYM tuning is complete.
 All output folders and files generated by `ALADYM_tuning.R` are written to the same directory in which the tuning script lives. No automatic cleanup is performed. To maintain an organised project structure, it is recommended to manually create a species-specific folder and move all tuning outputs into that location once the procedure has completed, as shown below:
 
 <p align="center">
-  <img src="cleanup_folder.png" width="80%">
+  <img src="figs/cleanup_folder.png" width="80%">
 </p>
 
 ```{r, echo=FALSE, results='asis', message=FALSE}
@@ -442,6 +425,66 @@ library(kableExtra)
 
 cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
 Figure 4 - Example of species-specific folders to cleanup the repository.
+</div>')
+```
+
+## Results
+
+The Tr–Fbar tuning example shown in this tutorial uses data for *Mullus barbatus* (MUT) in GSAs 17–18, originating from an existing case study application. The objective of this example is purely methodological: to demonstrate how the tuning workflow operates and how calibration outputs should be interpreted.
+
+For simplicity, all fleet segments were aggregated into a single representative fleet. Consequently, parameter optimisation was performed with respect to total fleet indicators, namely total spawning stock biomass (SSB), total fishing mortality (Fbar), and total catches. 
+
+The parameter space explored in this example consisted of:
+
+- recruitment timing values
+
+$$
+Tr=\{0,1,2,3\},
+$$
+- Fbar age ranges
+$$
+(0,1), (2,3), (4,5).
+$$
+All possible combinations between Tr values and Fbar age ranges were generated and evaluated through the automated grid-search procedure described in the previous sections.
+
+The results show the best combo diagnostics plot representing the simulated indicators SSB, F and catch against the observed values. The best performing combo was found to be $Tr = 2$ and $Fbar = (4, 5)$.
+
+<p align="center">
+  <img src="results/MUT_catch.jpeg" width="100%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 5 - Simulated vs Observed catch for best performing parameters \nTr = 2 and Fbar = (4, 5).
+</div>')
+```
+
+<p align="center">
+  <img src="results/MUT_F.jpeg" width="100%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 6 - Simulated vs Observed F for best performing parameters Tr = 2 and Fbar = (4, 5).
+</div>')
+```
+
+<p align="center">
+  <img src="results/MUT_SSB.jpeg" width="100%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 7 - Simulated vs Observed SSB for best performing parameters Tr = 2 and Fbar = (4, 5).
 </div>')
 ```
 
@@ -559,7 +602,7 @@ The result is a set of complete selectivity configuration files in which every f
 Following the remaining steps of `ALADYM_tuning_selectivity_main_script.R` will create two folders: one folder named `selectivity_combinations` containing all combinations of the selectivity-specific parameters is created within the specified species folder, whereas the folder of configurations that specify the path of each selectivity file is created in the folder `selectivity_configs_SPE`, as shown below.
 
 <p align="center">
-  <img src="selectivity_folders.png" width="80%">
+  <img src="figs/selectivity_folders.png" width="80%">
 </p>
 
 ```{r, echo=FALSE, results='asis', message=FALSE}
@@ -567,16 +610,16 @@ library(knitr)
 library(kableExtra)
 
 cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
-Figure 5 - Example of selectivity configurations output folders.
+Figure 8 - Example of selectivity configurations output folders.
 </div>')
 ```
 
-These files are then used in batch mode by the selectivity tuning script, which evaluates their performance against stock- and fleet-level observations.
+These files are then used by the selectivity tuning script, which evaluates their performance against stock- and fleet-level observations.
 
 
 ## Running selectivity tuning
 
-Once configuration files are generated, the selectivity tuning run is launched in batch mode. For each configuration, ALADYM is executed and the following outputs are extracted:
+Once the configuration files are generated, the selectivity tuning run is launched. For each configuration, ALADYM is executed and the following outputs are extracted:
 
 - stock-level indicators (SSB, Fbar, total catch),
 
@@ -584,22 +627,181 @@ Once configuration files are generated, the selectivity tuning run is launched i
 
 Relative errors are computed both at the stock level and at the fleet level. Fleet errors are retained explicitly rather than collapsed immediately, allowing inspection of trade-offs between fleets.
 
-A global score is computed by combining stock-level errors with fleet-level error summaries. The weighting scheme is transparent and can be modified if required.
+In the same fashion as for the Tr-Fbar tuning, a global score is computed by combining stock-level errors with fleet-level error summaries.
 
 ## Outputs and diagnostics
 
-Selectivity tuning produces:
+Selectivity tuning extends the Tr–Fbar calibration framework by evaluating not only stock-level agreement (SSB, Fbar, total catch) but also fleet-level catch dynamics. The objective is to identify, for each fixed selectivity type, the parameter combination that best fits simulated stock and fleet trajectories with observed data.
 
-- a comprehensive error table with one row per configuration,
+For each indicator $X$, the stock-level score is computed as before: 
 
-- fleet-specific error metrics,
+$$
+Score_{stock} =
+\frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2
++
+\frac{1}{T} \sum_{t=1}^T (Err_t^{Fbar})^2
++
+\frac{1}{T} \sum_{t=1}^T (Err_t^{Catch})^2.
+$$
+In addition, fleet-specific errors are computed for each fleet $f$:
 
-- diagnostic plots showing simulated versus observed catches for each fleet,
+$$
+Score_{fleet} =
+\sum_{f=1}^{F}
+\frac{1}{T} \sum_{t=1}^T
+\left( Err_{t,f}^{Catch} \right)^2,
+$$
+that is, the relative error between simulated fleet-level catch and observed fleet-level catch is calculated and included in the final weighted score:
 
-- aggregated plots showing all selectivity simulations against observations.
+$$
+Score = Score_{stock} + Score_{fleet}.
+$$
+This formulation preserves scale independence while ensuring that both stock-level consistency and fleet allocation patterns influence the ranking. Large mismatches in fleet catch distribution are therefore penalised even when aggregate stock dynamics appear satisfactory.
 
-The best-performing configuration is identified based on the defined score criterion, but alternative near-optimal solutions can be inspected to evaluate robustness and fleet trade-offs.
+All selectivity parameter combinations are accumulated into a cumulative calibration table, stored in the `Combo_runs_diagnostics` folder. Each row of the table contains:
 
+* Selectivity type (fixed per fleet),
+* Parameter values for active parameters,
+* Stock-level score,
+* Fleet-level score,
+* Final weighted score.
+
+<p align="center">
+  <img src="figs/calibration_table_selectivity.png" width="60%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 9 - Example of selectivity calibration table.
+</div>')
+```
+
+For each selectivity parameter combination, the script creates a dedicated output folder. Each folder contains:
+
+* Time series plots of simulated vs observed SSB,
+* Time series plots of simulated vs observed Fbar,
+* Time series plots of simulated vs observed total catch,
+* Fleet-level catch comparisons.
+
+These folders allow direct inspection of how each selectivity parameterisation alters stock and fleet dynamics.
+
+At the end of the process, the script identifies, for each selectivity type present in the model, the parameter combination that minimises the score.
+
+The results are saved as:
+
+* A plain text file `best_sel_combo` reporting the best parameter values per selectivity type and a plain text file `best_combo_result` containing their associated score.
+* A `Best_combo_diagnostics` folder containing diagnostic plots corresponding only to the best-performing configurations.
+* A `Combo_runs_diagnostics` folder containing diagnostics for all tested combinations.
+
+<p align="center">
+  <img src="figs/selectivity_diagnostics_folders.png" width="80%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 10 - Example of folders and files created after selectivity tuning is complete.
+</div>')
+```
+
+All output files and folders are written to the same directory in which the selectivity tuning script resides.
+
+No automatic cleanup or reorganisation is performed. To maintain a clear structure, it is recommended to create a species-specific folder and manually move the diagnostics folders and the best-parameter text files into that species directory, as shown below.
+
+<p align="center">
+  <img src="figs/cleanup_folder_selectivity.png" width="80%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 11 - Example of species-specific folders used to organise selectivity tuning outputs.
+</div>')
+```
+
+## Results
+
+A separate example is provided for the selectivity calibration workflow using data for *Parapeneus longirostris* (DPS) in GSAs 17, 18, 19 and 20.
+
+In this case study, three fleets were considered, all sharing the same selectivity formulation. The purpose of the example is to illustrate how selectivity-specific parameter combinations are generated and evaluated rather than to identify biologically optimal values.
+
+The fleets were assigned selectivity type 1, which corresponds to a classical ogive selectivity function:
+
+$$
+Sel(j) = \frac{1}{1 + e^{\frac{ln(9)}{SR}(SL_{50\%} - j)}}.
+$$
+
+Here the only selectivity parameters are the length at first capture $L_{50\%}$ (named $p_{11}$) and the selectivity range $SR = L_{75\%} - L_{25\%}$ (named $p_{12}$); the tested parameter ranges were:
+
+$$
+p_{11} = \{10, 15, 20 \}, \ \newline
+p_{12} = \{5, 6\}.\quad\quad\quad
+$$
+
+These values were intentionally limited to keep the example compact and computationally light. In practical applications, substantially wider parameter ranges and a larger number of combinations can be explored using the same workflow without modification to the code.
+
+For each fleet, named `GSA17`, `GSA18` and `GSA19`, the best selectivity parameter combination is reported in the plain text file `best_sel_combo`:
+
+<p align="center">
+  <img src="figs/best_sel_combo.png" width="28%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 12 - Best selectivity parameters for each fleet.
+</div>')
+```
+
+The reported graphs below show the fleet-level simulated catch against observed values for the best fleet-dependent selectivity parameter values.
+
+<p align="center">
+  <img src="results/DPS_17.jpeg" width="100%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 13 - Simulated vs Observed catch for fleet GSA17 with best performing parameters.
+</div>')
+```
+
+<p align="center">
+  <img src="results/DPS_18.jpeg" width="100%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 14 - Simulated vs Observed catch for fleet GSA18 with best performing parameters.
+</div>')
+```
+
+<p align="center">
+  <img src="results/DPS_19.jpeg" width="100%">
+</p>
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+library(knitr)
+library(kableExtra)
+
+cat('<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+Figure 15 - Simulated vs Observed catch for fleet GSA19 with best performing parameters.
+</div>')
+```
 
 
 

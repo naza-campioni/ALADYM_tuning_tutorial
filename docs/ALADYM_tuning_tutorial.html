@@ -234,11 +234,7 @@ window.Quarto = {
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#how-to-install-aladym-tuning" id="toc-how-to-install-aladym-tuning" class="nav-link" data-scroll-target="#how-to-install-aladym-tuning">How to install ALADYM tuning</a>
-  <ul>
-  <li><a href="#installation-and-setup-of-the-tuning-framework" id="toc-installation-and-setup-of-the-tuning-framework" class="nav-link" data-scroll-target="#installation-and-setup-of-the-tuning-framework">Installation and setup of the tuning framework</a></li>
-  <li><a href="#installation-procedure" id="toc-installation-procedure" class="nav-link" data-scroll-target="#installation-procedure">Installation procedure</a></li>
-  </ul></li>
+  <li><a href="#how-to-install-aladym-tuning" id="toc-how-to-install-aladym-tuning" class="nav-link" data-scroll-target="#how-to-install-aladym-tuning">How to install ALADYM tuning</a></li>
   <li><a href="#overview-of-the-tuning-workflow" id="toc-overview-of-the-tuning-workflow" class="nav-link" data-scroll-target="#overview-of-the-tuning-workflow">Overview of the tuning workflow</a></li>
   <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data preparation</a></li>
   <li><a href="#tr-fbar-tuning" id="toc-tr-fbar-tuning" class="nav-link" data-scroll-target="#tr-fbar-tuning">Tr-Fbar tuning</a>
@@ -247,6 +243,7 @@ window.Quarto = {
   <li><a href="#generation-of-trfbar-combinations" id="toc-generation-of-trfbar-combinations" class="nav-link" data-scroll-target="#generation-of-trfbar-combinations">Generation of Tr–Fbar combinations</a></li>
   <li><a href="#running-the-trfbar-tuning" id="toc-running-the-trfbar-tuning" class="nav-link" data-scroll-target="#running-the-trfbar-tuning">Running the Tr–Fbar tuning</a></li>
   <li><a href="#outputs-and-diagnostics" id="toc-outputs-and-diagnostics" class="nav-link" data-scroll-target="#outputs-and-diagnostics">Outputs and diagnostics</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a></li>
   </ul></li>
   <li><a href="#selectivity-tuning" id="toc-selectivity-tuning" class="nav-link" data-scroll-target="#selectivity-tuning">Selectivity tuning</a>
   <ul>
@@ -254,6 +251,7 @@ window.Quarto = {
   <li><a href="#generation-of-selectivity-configurations" id="toc-generation-of-selectivity-configurations" class="nav-link" data-scroll-target="#generation-of-selectivity-configurations">Generation of selectivity configurations</a></li>
   <li><a href="#running-selectivity-tuning" id="toc-running-selectivity-tuning" class="nav-link" data-scroll-target="#running-selectivity-tuning">Running selectivity tuning</a></li>
   <li><a href="#outputs-and-diagnostics-1" id="toc-outputs-and-diagnostics-1" class="nav-link" data-scroll-target="#outputs-and-diagnostics-1">Outputs and diagnostics</a></li>
+  <li><a href="#results-1" id="toc-results-1" class="nav-link" data-scroll-target="#results-1">Results</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -321,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
   // create logo
   var img = document.createElement("img");
-  img.src = "COISPA_colour.png";   // relative path from Rmd root
+  img.src = "logos/COISPA_colour.png";   // relative path from Rmd root
   img.alt = "COISPA logo";
 
   // insert: wrap replaces h1, then put logo + h1 inside wrap
@@ -332,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function(){
 </script>
 <!-- Links -->
 <div id="header-links">
-<p><a href="https://www.fondazionecoispa.org/" target="_blank"> <img src="COISPA_colour.png" width="50" height="22" style="margin-right:6px; vertical-align:middle;"> COISPA Website </a> <a href="https://github.com/COISPA" target="_blank"> <img src="github.svg" width="20" height="22" style="margin-right:6px; vertical-align:middle;"> COISPA Github </a></p>
+<p><a href="https://www.fondazionecoispa.org/" target="_blank"> <img src="logos/COISPA_colour.png" width="50" height="22" style="margin-right:6px; vertical-align:middle;"> COISPA Website </a> <a href="https://github.com/COISPA" target="_blank"> <img src="logos/github.svg" width="20" height="22" style="margin-right:6px; vertical-align:middle;"> COISPA Github </a></p>
 </div>
 <!-- start of the script -->
 <section id="introduction" class="level1">
@@ -346,7 +344,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <li><p>identifies parameter combinations that minimise a predefined error metric.</p></li>
 </ul>
 <p>This procedure replaces manual, GUI-driven trial-and-error calibration with a deterministic, script-driven process that is fully reproducible and traceable.</p>
-<p>The tuning framework is designed to be used after a standard BEMTOOL/ALADYM setup is already functional. It assumes that:</p>
+<p>The tuning framework is designed to be used after a standard BEMTOOL setup is already functional. It assumes that:</p>
 <ul>
 <li><p>ALADYM runs correctly for a single configuration,</p></li>
 <li><p>input data are internally consistent,</p></li>
@@ -355,21 +353,20 @@ document.addEventListener("DOMContentLoaded", function(){
 <p>This tuning module is not a replacement for the standard BEMTOOL workflow. It is a calibration step intended to improve the biological consistency of ALADYM before running management or bioeconomic scenarios. No knowledge of BEMTOOL’s economic or management scenario modules is required to apply the tuning, in that only ALADYM parameters are tuned.</p>
 <p>The approach is a structured grid search: no optimisation algorithm is employed. The procedure is diagnostic and comparative, not predictive.</p>
 <p>For a full description of BEMTOOL structure, data requirements, and installation, refer to the official tutorial: <a href="https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html">BEMTOOL Tutorial</a>.</p>
-<p>Installation of BEMTOOL and ALADYM must be completed following that guide before attempting any tuning procedure described below.</p>
+<p>Installation of BEMTOOL must be completed following that guide before attempting any tuning procedure described below.</p>
 </section>
 <section id="how-to-install-aladym-tuning" class="level1">
 <h1>How to install ALADYM tuning</h1>
-<section id="installation-and-setup-of-the-tuning-framework" class="level2">
-<h2 class="anchored" data-anchor-id="installation-and-setup-of-the-tuning-framework">Installation and setup of the tuning framework</h2>
-<p>The tuning workflow is distributed as a collection of <code>R</code> scripts, including the main execution files and the utility scripts responsible for generating configuration files. All these scripts must be downloaded together from the GitHub repository:</p>
-<p><strong>ADD REPOSITORY HERE</strong></p>
+<p>The tuning workflow is distributed as a collection of <code>R</code> scripts, including the main execution files and the utility scripts responsible for generating configuration files. All these scripts are found in the GitHub repository:</p>
+<p><a href="https://github.com/naza-campioni/ALADYM-ver.Tuning/tree/main">ALADYM tuning repository</a></p>
 <p>The repository contains:</p>
 <ul>
-<li><p>the Tr–Fbar tuning script,</p></li>
-<li><p>the selectivity tuning script,</p></li>
-<li><p>utility scripts used to create and modify configuration files (e.g.&nbsp;mortality adjustments, age regrouping, configuration writers).</p></li>
+<li><p>the scripts necessary to run the biological parameters tuning,</p></li>
+<li><p>the scripts necessary to run the selectivity parameters tuning,</p></li>
+<li><p>utility scripts used to create and modify configuration files (e.g.&nbsp;mortality adjustments, age regrouping, selectivity parameters).</p></li>
 </ul>
-<p>After downloading or cloning the repository, open the configuration-generation scripts, <code>ALADYM_tuning_main_config.R</code> and <code>ALADYM_tuning_selectivity_main_script.R</code>, and update the internal <code>source()</code> paths so that they point to the correct local location of the utility scripts.</p>
+<p>Before using the tuning framework, BEMTOOL must already be installed and fully operational.</p>
+<p>After downloading or cloning the repository, open the configuration-generation scripts, <code>ALADYM_tuning_main_config.R</code> and <code>ALADYM_tuning_selectivity_main_script.R</code> from, respectively, <code>Utils/Biological_tuning</code> and <code>Utils/Selectivity_tuning</code>, and update the internal <code>source()</code> paths so that they point to the correct local location of the utility scripts.</p>
 <p>That is, replace hard-coded paths</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"C:</span><span class="sc">\\</span><span class="st">Users</span><span class="sc">\\</span><span class="st">Nazareno Campioni</span><span class="sc">\\</span><span class="st">Desktop</span><span class="sc">\\</span><span class="st">ALADYM_tuning_utils</span><span class="sc">\\</span><span class="st">adjust_M_wrt_tr.R"</span>)</span>
@@ -388,23 +385,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"path/to/your/repository/utils/tuning_config_creation.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>All utility scripts must be reachable from the main script via correct relative or absolute paths. If these paths are not updated, configuration files will not be generated correctly.</p>
-</section>
-<section id="installation-procedure" class="level2">
-<h2 class="anchored" data-anchor-id="installation-procedure">Installation procedure</h2>
-<p>Before using the tuning framework, BEMTOOL must already be installed and fully operational.</p>
-<p>To install the tuning framework:</p>
-<ul>
-<li><p>Download the GitHub repository either by cloning it using git clone <repository_link> or by downloading the repository as a ZIP archive and extracting it locally.</repository_link></p></li>
-<li><p>Place the extracted folder in a working directory of your choice. The folder does not need to overwrite or replace the BEMTOOL installation; it operates externally.</p></li>
-<li><p>Open the main configuration-generation script and ensure all internal source() paths correctly reference the utility scripts.</p></li>
-<li><p>Execute the configuration-generation script to create the Tr–Fbar (or selectivity) configuration files.</p></li>
-<li><p>Open <code>ALADYM_tuning.R</code>, or <code>ALADYM_tuning_selectivity.R</code>, and run the calibration procedure by executing:</p></li>
-</ul>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"ALADYM_tuning.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>No additional installation steps are required. The tuning scripts rely on the existing BEMTOOL/ALADYM installation and operate by generating and executing alternative ALADYM configuration files, provided that internal paths are correctly defined.</p>
-</section>
+<p>No additional installation steps are required. The tuning scripts rely on the existing BEMTOOL installation and operate by generating and executing alternative ALADYM configuration files, provided that internal paths are correctly defined.</p>
 </section>
 <section id="overview-of-the-tuning-workflow" class="level1">
 <h1>Overview of the tuning workflow</h1>
@@ -413,7 +394,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <p>For each parameter combination, a numerical score is computed to summarise model performance. The combination that minimises this score is identified and stored as the best-performing solution. Finally, the tuning framework produces diagnostic plots and summary tables that allow the user to evaluate model behaviour, assess trade-offs, and verify the performance of the selected parameter set.</p>
 <p>The tuning procedure is deliberately restricted to a defined subset of ALADYM biological parameters, ensuring that calibration targets only the processes of interest.</p>
 <p align="center">
-<img src="fig1.png" width="60%">
+<img src="figs/fig1.png" width="60%">
 </p>
 <div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
 <p>Figure 1 - Conceptual overview of the ALADYM tuning framework.</p>
@@ -451,7 +432,7 @@ document.addEventListener("DOMContentLoaded", function(){
 <div class="cell-output-display">
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameters"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Distribution"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Min"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Max"],"name":[4],"type":["chr"],"align":["left"]},{"label":["A"],"name":[5],"type":["chr"],"align":["left"]},{"label":["B"],"name":[6],"type":["chr"],"align":["left"]},{"label":["X"],"name":[7],"type":["chr"],"align":["left"]},{"label":["X.1"],"name":[8],"type":["chr"],"align":["left"]},{"label":["X.2"],"name":[9],"type":["chr"],"align":["left"]},{"label":["X.3"],"name":[10],"type":["chr"],"align":["left"]},{"label":["X.4"],"name":[11],"type":["chr"],"align":["left"]},{"label":["X.5"],"name":[12],"type":["chr"],"align":["left"]},{"label":["X.6"],"name":[13],"type":["chr"],"align":["left"]},{"label":["X.7"],"name":[14],"type":["chr"],"align":["left"]},{"label":["X.8"],"name":[15],"type":["chr"],"align":["left"]},{"label":["X.9"],"name":[16],"type":["chr"],"align":["left"]},{"label":["X.10"],"name":[17],"type":["chr"],"align":["left"]},{"label":["X.11"],"name":[18],"type":["chr"],"align":["left"]},{"label":["X.12"],"name":[19],"type":["chr"],"align":["left"]},{"label":["X.13"],"name":[20],"type":["chr"],"align":["left"]},{"label":["X.14"],"name":[21],"type":["chr"],"align":["left"]},{"label":["X.15"],"name":[22],"type":["chr"],"align":["left"]},{"label":["X.16"],"name":[23],"type":["chr"],"align":["left"]},{"label":["X.17"],"name":[24],"type":["chr"],"align":["left"]},{"label":["X.18"],"name":[25],"type":["chr"],"align":["left"]},{"label":["X.19"],"name":[26],"type":["chr"],"align":["left"]},{"label":["X.20"],"name":[27],"type":["chr"],"align":["left"]},{"label":["X.21"],"name":[28],"type":["chr"],"align":["left"]},{"label":["X.22"],"name":[29],"type":["chr"],"align":["left"]},{"label":["X.23"],"name":[30],"type":["chr"],"align":["left"]},{"label":["X.24"],"name":[31],"type":["chr"],"align":["left"]},{"label":["X.25"],"name":[32],"type":["chr"],"align":["left"]}],"data":[{"1":"Scientific name","2":"Merluccius merluccius","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"1"},{"1":"Common name","2":"European hake","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"2"},{"1":"GSA","2":"17-18","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"3"},{"1":"start - end simulation - end forecast","2":"2004","3":"2024","4":"2030","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"4"},{"1":"Years to be presimulated","2":"21","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"5"},{"1":"Number of years for average","2":"1","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"6"},{"1":"gears","2":"ALB_18_DTS_1224","3":"HRV_17_DFN_0612","4":"HRV_17_HOK_0018_NoJabuka","5":"HRV_17_DTS_0640_NoJabuka","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"7"},{"1":"Sex ratio","2":"0.5","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"8"},{"1":"L-W parameters - Male","2":"","3":"","4":"","5":"9.20E-06","6":"2.9","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"9"},{"1":"L-W parameters - Female","2":"","3":"","4":"","5":"8.14E-06","6":"2.9","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"10"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Parameters"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Distribution"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Min"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Max"],"name":[4],"type":["chr"],"align":["left"]},{"label":["A"],"name":[5],"type":["chr"],"align":["left"]},{"label":["B"],"name":[6],"type":["chr"],"align":["left"]},{"label":["X"],"name":[7],"type":["chr"],"align":["left"]},{"label":["X.1"],"name":[8],"type":["chr"],"align":["left"]},{"label":["X.2"],"name":[9],"type":["chr"],"align":["left"]},{"label":["X.3"],"name":[10],"type":["chr"],"align":["left"]},{"label":["X.4"],"name":[11],"type":["chr"],"align":["left"]},{"label":["X.5"],"name":[12],"type":["chr"],"align":["left"]},{"label":["X.6"],"name":[13],"type":["chr"],"align":["left"]},{"label":["X.7"],"name":[14],"type":["chr"],"align":["left"]},{"label":["X.8"],"name":[15],"type":["chr"],"align":["left"]},{"label":["X.9"],"name":[16],"type":["chr"],"align":["left"]},{"label":["X.10"],"name":[17],"type":["chr"],"align":["left"]},{"label":["X.11"],"name":[18],"type":["chr"],"align":["left"]},{"label":["X.12"],"name":[19],"type":["chr"],"align":["left"]},{"label":["X.13"],"name":[20],"type":["chr"],"align":["left"]},{"label":["X.14"],"name":[21],"type":["chr"],"align":["left"]},{"label":["X.15"],"name":[22],"type":["chr"],"align":["left"]},{"label":["X.16"],"name":[23],"type":["chr"],"align":["left"]},{"label":["X.17"],"name":[24],"type":["chr"],"align":["left"]},{"label":["X.18"],"name":[25],"type":["chr"],"align":["left"]},{"label":["X.19"],"name":[26],"type":["chr"],"align":["left"]},{"label":["X.20"],"name":[27],"type":["chr"],"align":["left"]},{"label":["X.21"],"name":[28],"type":["chr"],"align":["left"]},{"label":["X.22"],"name":[29],"type":["chr"],"align":["left"]},{"label":["X.23"],"name":[30],"type":["chr"],"align":["left"]},{"label":["X.24"],"name":[31],"type":["chr"],"align":["left"]},{"label":["X.25"],"name":[32],"type":["chr"],"align":["left"]}],"data":[{"1":"Fishing coefficient file","2":"","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"50"},{"1":"Effort - F relationship","2":"L","3":"L","4":"L","5":"L","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"51"},{"1":"Effort - F relationship a","2":"0","3":"0","4":"0","5":"0","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"52"},{"1":"Effort - F relationship b","2":"1","3":"1","4":"1","5":"1","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"53"},{"1":"Discard component","2":"N","3":"N","4":"N","5":"N","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"[allowed values: Y, 0, NA]","_rn_":"54"},{"1":"Discard type","2":"NAN","3":"NAN","4":"NAN","5":"NAN","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"[allowed values: V, RO]","_rn_":"55"},{"1":"External Discard vector file","2":"","3":"","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"56"},{"1":"Reverse-ogive Discard file","2":"","3":"C:\\\\INPUT\\\\ALADYM\\\\M_MER_9_10_11\\\\Discard_reverse ogive.csv","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"57"},{"1":"Landing obligation file","2":"","3":"C:\\\\INPUT\\\\ALADYM\\\\M_MER_9_10_11\\\\ALADYM landing obligation.csv","4":"","5":"","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"58"},{"1":"Survivability proportion","2":"0.083333333","3":"0.083333333","4":"0.083333333","5":"0.083333333","6":"0.083333333","7":"0.083333333","8":"0.083333333","9":"0.083333333","10":"0.083333333","11":"0.083333333","12":"0.083333333","13":"0.083333333","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"","_rn_":"59"},{"1":"Discard survivability component","2":"N","3":"N","4":"N","5":"N","6":"","7":"","8":"","9":"","10":"","11":"","12":"","13":"","14":"","15":"","16":"","17":"","18":"","19":"","20":"","21":"","22":"","23":"","24":"","25":"","26":"","27":"","28":"","29":"","30":"","31":"","32":"[allowed values: Y, N]","_rn_":"60"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -481,59 +462,59 @@ document.addEventListener("DOMContentLoaded", function(){
 <li><p>Species-specific M and F input files must be stored in <code>C:\INPUT\ALADYM\species_folder</code>.</p></li>
 </ol>
 <p>If fishing mortality at age files are not available, the parameters <strong>F_at_age_F</strong> and <strong>F_at_age_M</strong> must be set to “None” in the baseline configuration. In this case, an <strong>Fbar_assessment</strong> file must be provided. All Z values will then be computed internally from the Fbar assessment data for each Tr–Fbar combination. This can be seen in the following example code.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## paths</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># input path - main folder where we can find M, F and config_file</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ip <span class="ot">&lt;-</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">INPUT</span><span class="sc">\\</span><span class="st">ALADYM"</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># output path - where you want to save the output (usually C:\INPUT\ALADYM)</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">INPUT</span><span class="sc">\\</span><span class="st">ALADYM"</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># species folder - used for M and F files</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>species_folder <span class="ot">&lt;-</span> <span class="st">"MUT1718"</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># are there different M files for males and females?</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>M_different <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="do">## set the M files names -&gt; make sure these start from age = 0 </span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># sex-specific files?</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>M_male <span class="ot">&lt;-</span> <span class="st">"M_MUT_M.csv"</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>M_female <span class="ot">&lt;-</span> <span class="st">"M_MUT_F.csv"</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="co"># instead, if they have the same file:</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>M_file <span class="ot">&lt;-</span> <span class="st">"M_MUT.csv"</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="do">## if F_at_age files exist</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>F_at_age_M <span class="ot">&lt;-</span> <span class="st">"F_at_age_MUT_M.csv"</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>F_at_age_F <span class="ot">&lt;-</span> <span class="st">"F_at_age_MUT_F.csv"</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>Fbar_assessment <span class="ot">&lt;-</span> <span class="st">"None"</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="co"># otherwise, if there is only an Fbar file coming from the assessment</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="co"># F_at_age_M &lt;- "None"</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="co"># F_at_age_F &lt;- "None</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Fbar_assessment &lt;- "Fbar_assessment_MUT.csv"</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="do">## set initial configuration file -&gt; must live in C:\INPUT\ALADYM</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="do">## make sure that NA values are specified as NAN (needed for the splitting)</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>configuration <span class="ot">&lt;-</span> <span class="st">"aladym_MUT_GSA17_18.csv"</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="do">## set tr</span></span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>tr <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
-<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a><span class="do">## set F_range over which to calculate Fbar, eg: list(c(0,3),c(1,4))</span></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="co"># if you only have Fbar from assessment, set F_range = None</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>F_range <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>),<span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">5</span>))</span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="co"># F_range = "None"</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="do">## time series</span></span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">2004</span><span class="sc">:</span><span class="dv">2024</span>)</span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="do">## species</span></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>spe <span class="ot">=</span> <span class="st">'MUT'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## paths</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># input path - main folder where we can find M, F and config_file</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>ip <span class="ot">&lt;-</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">INPUT</span><span class="sc">\\</span><span class="st">ALADYM"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># output path - where you want to save the output (usually C:\INPUT\ALADYM)</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>op <span class="ot">&lt;-</span> <span class="st">"C:</span><span class="sc">\\</span><span class="st">INPUT</span><span class="sc">\\</span><span class="st">ALADYM"</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># species folder - used for M and F files</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>species_folder <span class="ot">&lt;-</span> <span class="st">"MUT1718"</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># are there different M files for males and females?</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>M_different <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="do">## set the M files names -&gt; make sure these start from age = 0 </span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co"># sex-specific files?</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>M_male <span class="ot">&lt;-</span> <span class="st">"M_MUT_M.csv"</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>M_female <span class="ot">&lt;-</span> <span class="st">"M_MUT_F.csv"</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co"># instead, if they have the same file:</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>M_file <span class="ot">&lt;-</span> <span class="st">"M_MUT.csv"</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="do">## if F_at_age files exist</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>F_at_age_M <span class="ot">&lt;-</span> <span class="st">"F_at_age_MUT_M.csv"</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>F_at_age_F <span class="ot">&lt;-</span> <span class="st">"F_at_age_MUT_F.csv"</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>Fbar_assessment <span class="ot">&lt;-</span> <span class="st">"None"</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co"># otherwise, if there is only an Fbar file coming from the assessment</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co"># F_at_age_M &lt;- "None"</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="co"># F_at_age_F &lt;- "None</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="co"># Fbar_assessment &lt;- "Fbar_assessment_MUT.csv"</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="do">## set initial configuration file -&gt; must live in C:\INPUT\ALADYM</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="do">## make sure that NA values are specified as NAN (needed for the splitting)</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>configuration <span class="ot">&lt;-</span> <span class="st">"aladym_MUT_GSA17_18.csv"</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="do">## set tr</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>tr <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="do">## set F_range over which to calculate Fbar, eg: list(c(0,3),c(1,4))</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="co"># if you only have Fbar from assessment, set F_range = None</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>F_range <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>),<span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">5</span>))</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co"># F_range = "None"</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="do">## time series</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>ts <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">2004</span><span class="sc">:</span><span class="dv">2024</span>)</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="do">## species</span></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>spe <span class="ot">=</span> <span class="st">'MUT'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Example of input paths for the creation of different ALADYM configuration files.</code></pre>
@@ -565,7 +546,7 @@ Score = \frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2 + \frac{1}{T} \sum_{t=1}^T (Err
 \]</span> The use of squared relative errors ensures scale-independence across indicators with different magnitudes and penalises large deviations more strongly than small ones.</p>
 <p>All results are accumulated into a single calibration table that links each Tr–Fbar combination to its diagnostic metrics and overall score, found in the <code>Combo_runs_diagnostics</code> folder.</p>
 <p align="center">
-<img src="calibration_table.png" width="60%">
+<img src="figs/calibration_table.png" width="60%">
 </p>
 <div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
 <p>Figure 2 - Calibration table.</p>
@@ -573,17 +554,50 @@ Score = \frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2 + \frac{1}{T} \sum_{t=1}^T (Err
 <p>In parallel, the script creates a dedicated output folder for each parameter combination. Each folder contains the full set of diagnostic plots and intermediate results associated with that specific run, allowing post hoc inspection of individual simulations.</p>
 <p>At the end of the tuning process, the script identifies the Tr–Fbar combination with the lowest total score. This best-performing configuration is recorded in a plain text file that reports the selected Tr value, Fbar age range, and associated score. In addition, two summary output directories are produced: one containing the diagnostics for all tested combinations, and a second containing only the diagnostics associated with the best-performing configuration.</p>
 <p align="center">
-<img src="AL_tutorial_diagnostics_folders.png" width="80%">
+<img src="figs/AL_tutorial_diagnostics_folders.png" width="80%">
 </p>
 <div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
 <p>Figure 3 - Example of folders and files created after ALADYM tuning is complete.</p>
 </div>
 <p>All output folders and files generated by <code>ALADYM_tuning.R</code> are written to the same directory in which the tuning script lives. No automatic cleanup is performed. To maintain an organised project structure, it is recommended to manually create a species-specific folder and move all tuning outputs into that location once the procedure has completed, as shown below:</p>
 <p align="center">
-<img src="cleanup_folder.png" width="80%">
+<img src="figs/cleanup_folder.png" width="80%">
 </p>
 <div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
 <p>Figure 4 - Example of species-specific folders to cleanup the repository.</p>
+</div>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<p>The Tr–Fbar tuning example shown in this tutorial uses data for <em>Mullus barbatus</em> (MUT) in GSAs 17–18, originating from an existing case study application. The objective of this example is purely methodological: to demonstrate how the tuning workflow operates and how calibration outputs should be interpreted.</p>
+<p>For simplicity, all fleet segments were aggregated into a single representative fleet. Consequently, parameter optimisation was performed with respect to total fleet indicators, namely total spawning stock biomass (SSB), total fishing mortality (Fbar), and total catches.</p>
+<p>The parameter space explored in this example consisted of:</p>
+<ul>
+<li>recruitment timing values</li>
+</ul>
+<p><span class="math display">\[
+Tr=\{0,1,2,3\},
+\]</span> - Fbar age ranges <span class="math display">\[
+(0,1), (2,3), (4,5).
+\]</span> All possible combinations between Tr values and Fbar age ranges were generated and evaluated through the automated grid-search procedure described in the previous sections.</p>
+<p>The results show the best combo diagnostics plot representing the simulated indicators SSB, F and catch against the observed values. The best performing combo was found to be <span class="math inline">\(Tr = 2\)</span> and <span class="math inline">\(Fbar = (4, 5)\)</span>.</p>
+<p align="center">
+<img src="results/MUT_catch.jpeg" width="100%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 5 - Simulated vs Observed catch for best performing parameters Tr = 2 and Fbar = (4, 5).</p>
+</div>
+<p align="center">
+<img src="results/MUT_F.jpeg" width="100%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 6 - Simulated vs Observed F for best performing parameters Tr = 2 and Fbar = (4, 5).</p>
+</div>
+<p align="center">
+<img src="results/MUT_SSB.jpeg" width="100%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 7 - Simulated vs Observed SSB for best performing parameters Tr = 2 and Fbar = (4, 5).</p>
 </div>
 </section>
 </section>
@@ -604,63 +618,63 @@ Score = \frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2 + \frac{1}{T} \sum_{t=1}^T (Err
 <li><p>Each key represents a selectivity type identifier.</p></li>
 <li><p>Each value is the set of parameter names that are active for that function.</p></li>
 </ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hash)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define selectivity dictionary:</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># maps selectivity type -&gt; parameters used</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>selectivity_id <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"1"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"2"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"3"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"4"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"5"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>, <span class="st">"param4"</span>, <span class="st">"param5"</span>),</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"6"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define selectivity parameters combinations per selectivity type</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 1</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>p11 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>) <span class="co">#seq(15, 20)</span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>p12 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>) <span class="co">#seq(3, 7)</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 2</span></span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>p21 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>p22 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>p23 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">10</span>)</span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 3</span></span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>p31 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>)</span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>p32 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 4</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>p41 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>p42 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>)</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>p43 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 5</span></span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>p51 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>p52 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>p53 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>p54 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>p55 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 6</span></span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>p61 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>p62 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>)</span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>p63 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">15</span>)</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co"># per-selectivity-type parameters</span></span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>params_sel <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">"1"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p11, p12)</span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'2'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p21, p22, p23)</span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'3'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p31, p32)</span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'4'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p41, p42, p43)</span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'5'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p51, p52, p53, p54, p55)</span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'6'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p61, p62, p63)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hash)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define selectivity dictionary:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># maps selectivity type -&gt; parameters used</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>selectivity_id <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"1"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"2"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"3"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"4"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"5"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>, <span class="st">"param4"</span>, <span class="st">"param5"</span>),</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"6"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define selectivity parameters combinations per selectivity type</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 1</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>p11 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>) <span class="co">#seq(15, 20)</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>p12 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>) <span class="co">#seq(3, 7)</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 2</span></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>p21 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>p22 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>p23 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">10</span>)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 3</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>p31 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>p32 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 4</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>p41 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>p42 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>)</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>p43 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 5</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>p51 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>p52 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>p53 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>p54 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>p55 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 6</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>p61 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>p62 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>)</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>p63 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">15</span>)</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="co"># per-selectivity-type parameters</span></span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>params_sel <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">"1"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p11, p12)</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'2'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p21, p22, p23)</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'3'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p31, p32)</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'4'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p41, p42, p43)</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'5'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p51, p52, p53, p54, p55)</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'6'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p61, p62, p63)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Example of how to specify the selectivity parameters range to use in the creation of different ALADYM configuration files.</code></pre>
@@ -682,33 +696,128 @@ Score = \frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2 + \frac{1}{T} \sum_{t=1}^T (Err
 <p>The result is a set of complete selectivity configuration files in which every fleet retains its original functional form, and only the allowed parameters are varied. Combinations are therefore selectivity-type-specific and fleet-specific. This structure guarantees that a fleet assigned a logistic function will never receive parameters belonging to a dome-shaped function, and no configuration will mix parameter sets incompatible with the declared selectivity type.</p>
 <p>Following the remaining steps of <code>ALADYM_tuning_selectivity_main_script.R</code> will create two folders: one folder named <code>selectivity_combinations</code> containing all combinations of the selectivity-specific parameters is created within the specified species folder, whereas the folder of configurations that specify the path of each selectivity file is created in the folder <code>selectivity_configs_SPE</code>, as shown below.</p>
 <p align="center">
-<img src="selectivity_folders.png" width="80%">
+<img src="figs/selectivity_folders.png" width="80%">
 </p>
 <div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
-<p>Figure 5 - Example of selectivity configurations output folders.</p>
+<p>Figure 8 - Example of selectivity configurations output folders.</p>
 </div>
-<p>These files are then used in batch mode by the selectivity tuning script, which evaluates their performance against stock- and fleet-level observations.</p>
+<p>These files are then used by the selectivity tuning script, which evaluates their performance against stock- and fleet-level observations.</p>
 </section>
 <section id="running-selectivity-tuning" class="level2">
 <h2 class="anchored" data-anchor-id="running-selectivity-tuning">Running selectivity tuning</h2>
-<p>Once configuration files are generated, the selectivity tuning run is launched in batch mode. For each configuration, ALADYM is executed and the following outputs are extracted:</p>
+<p>Once the configuration files are generated, the selectivity tuning run is launched. For each configuration, ALADYM is executed and the following outputs are extracted:</p>
 <ul>
 <li><p>stock-level indicators (SSB, Fbar, total catch),</p></li>
 <li><p>fleet-specific annual catches.</p></li>
 </ul>
 <p>Relative errors are computed both at the stock level and at the fleet level. Fleet errors are retained explicitly rather than collapsed immediately, allowing inspection of trade-offs between fleets.</p>
-<p>A global score is computed by combining stock-level errors with fleet-level error summaries. The weighting scheme is transparent and can be modified if required.</p>
+<p>In the same fashion as for the Tr-Fbar tuning, a global score is computed by combining stock-level errors with fleet-level error summaries.</p>
 </section>
 <section id="outputs-and-diagnostics-1" class="level2">
 <h2 class="anchored" data-anchor-id="outputs-and-diagnostics-1">Outputs and diagnostics</h2>
-<p>Selectivity tuning produces:</p>
+<p>Selectivity tuning extends the Tr–Fbar calibration framework by evaluating not only stock-level agreement (SSB, Fbar, total catch) but also fleet-level catch dynamics. The objective is to identify, for each fixed selectivity type, the parameter combination that best fits simulated stock and fleet trajectories with observed data.</p>
+<p>For each indicator <span class="math inline">\(X\)</span>, the stock-level score is computed as before:</p>
+<p><span class="math display">\[
+Score_{stock} =
+\frac{1}{T} \sum_{t=1}^T (Err_t^{SSB})^2
++
+\frac{1}{T} \sum_{t=1}^T (Err_t^{Fbar})^2
++
+\frac{1}{T} \sum_{t=1}^T (Err_t^{Catch})^2.
+\]</span> In addition, fleet-specific errors are computed for each fleet <span class="math inline">\(f\)</span>:</p>
+<p><span class="math display">\[
+Score_{fleet} =
+\sum_{f=1}^{F}
+\frac{1}{T} \sum_{t=1}^T
+\left( Err_{t,f}^{Catch} \right)^2,
+\]</span> that is, the relative error between simulated fleet-level catch and observed fleet-level catch is calculated and included in the final weighted score:</p>
+<p><span class="math display">\[
+Score = Score_{stock} + Score_{fleet}.
+\]</span> This formulation preserves scale independence while ensuring that both stock-level consistency and fleet allocation patterns influence the ranking. Large mismatches in fleet catch distribution are therefore penalised even when aggregate stock dynamics appear satisfactory.</p>
+<p>All selectivity parameter combinations are accumulated into a cumulative calibration table, stored in the <code>Combo_runs_diagnostics</code> folder. Each row of the table contains:</p>
 <ul>
-<li><p>a comprehensive error table with one row per configuration,</p></li>
-<li><p>fleet-specific error metrics,</p></li>
-<li><p>diagnostic plots showing simulated versus observed catches for each fleet,</p></li>
-<li><p>aggregated plots showing all selectivity simulations against observations.</p></li>
+<li>Selectivity type (fixed per fleet),</li>
+<li>Parameter values for active parameters,</li>
+<li>Stock-level score,</li>
+<li>Fleet-level score,</li>
+<li>Final weighted score.</li>
 </ul>
-<p>The best-performing configuration is identified based on the defined score criterion, but alternative near-optimal solutions can be inspected to evaluate robustness and fleet trade-offs.</p>
+<p align="center">
+<img src="figs/calibration_table_selectivity.png" width="60%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 9 - Example of selectivity calibration table.</p>
+</div>
+<p>For each selectivity parameter combination, the script creates a dedicated output folder. Each folder contains:</p>
+<ul>
+<li>Time series plots of simulated vs observed SSB,</li>
+<li>Time series plots of simulated vs observed Fbar,</li>
+<li>Time series plots of simulated vs observed total catch,</li>
+<li>Fleet-level catch comparisons.</li>
+</ul>
+<p>These folders allow direct inspection of how each selectivity parameterisation alters stock and fleet dynamics.</p>
+<p>At the end of the process, the script identifies, for each selectivity type present in the model, the parameter combination that minimises the score.</p>
+<p>The results are saved as:</p>
+<ul>
+<li>A plain text file <code>best_sel_combo</code> reporting the best parameter values per selectivity type and a plain text file <code>best_combo_result</code> containing their associated score.</li>
+<li>A <code>Best_combo_diagnostics</code> folder containing diagnostic plots corresponding only to the best-performing configurations.</li>
+<li>A <code>Combo_runs_diagnostics</code> folder containing diagnostics for all tested combinations.</li>
+</ul>
+<p align="center">
+<img src="figs/selectivity_diagnostics_folders.png" width="80%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 10 - Example of folders and files created after selectivity tuning is complete.</p>
+</div>
+<p>All output files and folders are written to the same directory in which the selectivity tuning script resides.</p>
+<p>No automatic cleanup or reorganisation is performed. To maintain a clear structure, it is recommended to create a species-specific folder and manually move the diagnostics folders and the best-parameter text files into that species directory, as shown below.</p>
+<p align="center">
+<img src="figs/cleanup_folder_selectivity.png" width="80%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 11 - Example of species-specific folders used to organise selectivity tuning outputs.</p>
+</div>
+</section>
+<section id="results-1" class="level2">
+<h2 class="anchored" data-anchor-id="results-1">Results</h2>
+<p>A separate example is provided for the selectivity calibration workflow using data for <em>Parapeneus longirostris</em> (DPS) in GSAs 17, 18, 19 and 20.</p>
+<p>In this case study, three fleets were considered, all sharing the same selectivity formulation. The purpose of the example is to illustrate how selectivity-specific parameter combinations are generated and evaluated rather than to identify biologically optimal values.</p>
+<p>The fleets were assigned selectivity type 1, which corresponds to a classical ogive selectivity function:</p>
+<p><span class="math display">\[
+Sel(j) = \frac{1}{1 + e^{\frac{ln(9)}{SR}(SL_{50\%} - j)}}.
+\]</span></p>
+<p>Here the only selectivity parameters are the length at first capture <span class="math inline">\(L_{50\%}\)</span> (named <span class="math inline">\(p_{11}\)</span>) and the selectivity range <span class="math inline">\(SR = L_{75\%} - L_{25\%}\)</span> (named <span class="math inline">\(p_{12}\)</span>); the tested parameter ranges were:</p>
+<p><span class="math display">\[
+p_{11} = \{10, 15, 20 \}, \ \newline
+p_{12} = \{5, 6\}.\quad\quad\quad
+\]</span></p>
+<p>These values were intentionally limited to keep the example compact and computationally light. In practical applications, substantially wider parameter ranges and a larger number of combinations can be explored using the same workflow without modification to the code.</p>
+<p>For each fleet, named <code>GSA17</code>, <code>GSA18</code> and <code>GSA19</code>, the best selectivity parameter combination is reported in the plain text file <code>best_sel_combo</code>:</p>
+<p align="center">
+<img src="figs/best_sel_combo.png" width="28%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 12 - Best selectivity parameters for each fleet.</p>
+</div>
+<p>The reported graphs below show the fleet-level simulated catch against observed values for the best fleet-dependent selectivity parameter values.</p>
+<p align="center">
+<img src="results/DPS_17.jpeg" width="100%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 13 - Simulated vs Observed catch for fleet GSA17 with best performing parameters.</p>
+</div>
+<p align="center">
+<img src="results/DPS_18.jpeg" width="100%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 14 - Simulated vs Observed catch for fleet GSA18 with best performing parameters.</p>
+</div>
+<p align="center">
+<img src="results/DPS_19.jpeg" width="100%">
+</p>
+<div style="text-align:center; font-weight:300; margin-bottom:0.5rem;">
+<p>Figure 15 - Simulated vs Observed catch for fleet GSA19 with best performing parameters.</p>
+</div>
 
 
 </section>
