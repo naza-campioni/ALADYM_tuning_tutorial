@@ -417,6 +417,10 @@ document.addEventListener("DOMContentLoaded", function(){
 <p><a href="data/production.csv" download=""> Production csv example </a></p>
 <p>These files illustrate the correct ALADYM format and differ from the standard BEMTOOL input structure. Users should not attempt to reuse BEMTOOL landings files directly without restructuring them into the species-specific ALADYM format.</p>
 <p>In practice, this means that tuning must be conducted separately for each stock. The workflow (generation of configurations, automated batch runs, score computation and diagnostics) remains identical, but all input data must be prepared independently for each species.</p>
+<p>Since the goal of the tuning process is to compare ALADYM outputs to stock assessment outputs, Fbar, SSB and catches <code>.csv</code> files need to be provided in the main ALADYM tuning folder (eg, <code>ALADYM-ver.Tuning</code>):</p>
+<p><a href="data/catches.csv" download=""> Catches csv example </a></p>
+<p><a href="data/ssb.csv" download=""> SSB csv example </a></p>
+<p><a href="data/fbar.csv" download=""> Fbar csv example </a></p>
 </section>
 <section id="tr-fbar-tuning" class="level1">
 <h1>Tr-Fbar tuning</h1>
@@ -607,17 +611,19 @@ Tr=\{0,1,2,3\},
 <section id="input-data-requirements-1" class="level2">
 <h2 class="anchored" data-anchor-id="input-data-requirements-1">Input data requirements</h2>
 <p>The baseline ALADYM configuration used for selectivity is the same as the one used for the Tr-Fbar tuning with the exception that the Tr and Fbar values must now be set to the identified, best performing Tr-Fbar combination. Consequently, the specified M file should be the one starting at the selected Tr value. Again, we remind that <code>NA</code> values must be encoded as <code>NAN</code>.</p>
+<p>If not done previously, the selectivity files will need to be modified as follows: a new column named <code>type</code> needs to be created and the metier type needs to be specified - that is, <code>HOK</code>, <code>DTS</code> etc.</p>
 </section>
 <section id="generation-of-selectivity-configurations" class="level2">
 <h2 class="anchored" data-anchor-id="generation-of-selectivity-configurations">Generation of selectivity configurations</h2>
 <p>Selectivity configuration generation is more structured than Tr–Fbar tuning because BEMTOOL gives the possibility to choose among six functions for selectivity. Each function is associated therefore to a different subset of parameters.</p>
 <p>The tuning framework does not attempt to switch between selectivity functions: the selectivity type for each fleet segment is fixed in the original selectivity Excel file and remains unchanged throughout tuning. What is explored are alternative values of the parameters associated with that specific function. This is handled via</p>
 <p><code>ALADYM_tuning_selectivity_main_script.R</code>.</p>
-<p>The configuration-generation step begins by defining a mapping between selectivity types and the parameters they are allowed to use. This mapping is implemented as a hash map where:</p>
+<p>Since we assume that selectivity is similar across metiers, the configuration-generation step begins by defining a mapping between metier types and the parameters they are allowed to use. This mapping is implemented as a hash map where:</p>
 <ul>
-<li><p>Each key represents a selectivity type identifier.</p></li>
+<li><p>Each key represents a metier identifier.</p></li>
 <li><p>Each value is the set of parameter names that are active for that function.</p></li>
 </ul>
+<p>Again, each metier is associated with a selectivity type and this is known a priori. All six selectivity types have their number of parameters; for the example below, all metiers have the same number of parameters but their selectivity type is either 2 or 6. For details on the selectivity types, consult the <a href="https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html">BEMTOOL official guide</a>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(hash)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
@@ -625,62 +631,49 @@ Tr=\{0,1,2,3\},
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># maps selectivity type -&gt; parameters used</span></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>selectivity_id <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"1"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"2"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"3"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"4"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"5"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>, <span class="st">"param4"</span>, <span class="st">"param5"</span>),</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                              <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"6"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Define selectivity parameters combinations per selectivity type</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 1</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>p11 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">20</span>) <span class="co">#seq(15, 20)</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>p12 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">6</span>) <span class="co">#seq(3, 7)</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 2</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>p21 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>p22 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>p23 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">8</span>, <span class="dv">10</span>)</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 3</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>p31 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>)</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>p32 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">"DTS"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">'DFN'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">'HOK'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>selectivity_id[[<span class="st">'PGP'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">"param1"</span>, <span class="st">"param2"</span>, <span class="st">"param3"</span>), <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Define selectivity parameters combinations per metier</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># -----------------------------------------------------</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># dts</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>p_dts_1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">140</span>, <span class="dv">160</span>, <span class="dv">180</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>p_dts_2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">30</span>, <span class="dv">50</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>p_dts_3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">430</span>, <span class="dv">450</span>, <span class="dv">470</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="co"># dfn</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>p_dfn_1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">360</span>, <span class="dv">380</span>, <span class="dv">400</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>p_dfn_2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">140</span>, <span class="dv">160</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>p_dfn_3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">140</span>, <span class="dv">160</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="co"># hok</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>p_hok_1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">430</span>, <span class="dv">450</span>, <span class="dv">470</span>)</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>p_hok_2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">80</span>, <span class="dv">100</span>, <span class="dv">120</span>)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>p_hok_3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">100</span>, <span class="dv">120</span>, <span class="dv">140</span>)</span>
 <span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 4</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>p41 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>p42 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">7</span>)</span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>p43 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">8</span>)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a><span class="co"># pgp</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>p_pgp_1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">360</span>, <span class="dv">380</span>, <span class="dv">400</span>)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>p_pgp_2 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">140</span>, <span class="dv">160</span>)</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>p_pgp_3 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">120</span>, <span class="dv">140</span>, <span class="dv">160</span>)</span>
 <span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 5</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>p51 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>p52 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>p53 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>p54 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>p55 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a><span class="co"># sel 6</span></span>
-<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>p61 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12</span>, <span class="dv">25</span>)</span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>p62 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>)</span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>p63 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">15</span>)</span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a><span class="co"># per-selectivity-type parameters</span></span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>params_sel <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">"1"</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p11, p12)</span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'2'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p21, p22, p23)</span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'3'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p31, p32)</span>
-<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'4'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p41, p42, p43)</span>
-<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'5'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p51, p52, p53, p54, p55)</span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'6'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p61, p62, p63)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="co"># per-selectivity-type parameters</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>params_sel <span class="ot">&lt;-</span> <span class="fu">hash</span>()</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'DTS'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p_dts_1, p_dts_2, p_dts_3)</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'DFN'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p_dfn_1, p_dfn_2, p_dfn_3)</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'HOK'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p_hok_1, p_hok_2, p_hok_3)</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>params_sel[[<span class="st">'PGP'</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(p_pgp_1, p_pgp_2, p_pgp_3)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code>Example of how to specify the selectivity parameters range to use in the creation of different ALADYM configuration files.</code></pre>
 </div>
 </div>
-<p>For example, a logistic function may allow only an inflection age and a slope parameter, whereas a dome-shaped function may allow parameters controlling peak age and curvature. Although the input file contains a fixed number of parameter columns, only the parameters listed in the mapping for the selected type are considered active. The remaining parameter slots are ignored during combination generation and remain fixed at their baseline values.</p>
+<p>These parameters control the shape of the function associated with each selectivity type; for example, HOK is given a selectivity type of 6 which corresponds to a dome-shaped function and consequently its parameters control peak, age and curvature. Although the input file contains a fixed number of parameter columns, only the parameters listed in the mapping for the selected type are considered active. The remaining parameter slots are ignored during combination generation and remain fixed at their baseline values.</p>
 <p>During configuration creation, the script performs the following sequence:</p>
 <ol type="1">
 <li><p>It reads the baseline selectivity file and identifies, for each fleet, the assigned selectivity type.</p></li>

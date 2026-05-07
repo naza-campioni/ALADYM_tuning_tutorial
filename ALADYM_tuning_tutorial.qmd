@@ -208,6 +208,20 @@ These files illustrate the correct ALADYM format and differ from the standard BE
 
 In practice, this means that tuning must be conducted separately for each stock. The workflow (generation of configurations, automated batch runs, score computation and diagnostics) remains identical, but all input data must be prepared independently for each species.
 
+Since the goal of the tuning process is to compare ALADYM outputs to stock assessment outputs, Fbar, SSB and catches `.csv` files need to be provided in the main ALADYM tuning folder (eg, `ALADYM-ver.Tuning`):
+
+<a href="data/catches.csv" download>
+Catches csv example
+</a>
+
+<a href="data/ssb.csv" download>
+SSB csv example
+</a>
+
+<a href="data/fbar.csv" download>
+Fbar csv example
+</a>
+
 # Tr-Fbar tuning
 
 The _Tr–Fbar_ tuning explores alternative combinations of the recruitment timing parameter _Tr_ and the age range used to compute mean fishing mortality _Fbar_. All other biological and fleet parameters are held fixed. The goal is to identify the Tr–Fbar combination that minimises the discrepancy between ALADYM outputs and stock assessment time series.
@@ -496,6 +510,8 @@ Selectivity tuning is performed only after the Tr–Fbar tuning stage has conver
 
 The baseline ALADYM configuration used for selectivity is the same as the one used for the Tr-Fbar tuning with the exception that the Tr and Fbar values must now be set to the identified, best performing Tr-Fbar combination. Consequently, the specified M file should be the one starting at the selected Tr value. Again, we remind that `NA` values must be encoded as `NAN`.
 
+If not done previously, the selectivity files will need to be modified as follows: a new column named `type` needs to be created and the metier type needs to be specified - that is, `HOK`, `DTS` etc.
+
 ## Generation of selectivity configurations
 
 Selectivity configuration generation is more structured than Tr–Fbar tuning because BEMTOOL gives the possibility to choose among six functions for selectivity. Each function is associated therefore to a different subset of parameters.
@@ -504,11 +520,13 @@ The tuning framework does not attempt to switch between selectivity functions: t
 
 `ALADYM_tuning_selectivity_main_script.R`.
 
-The configuration-generation step begins by defining a mapping between selectivity types and the parameters they are allowed to use. This mapping is implemented as a hash map where:
+Since we assume that selectivity is similar across metiers, the configuration-generation step begins by defining a mapping between metier types and the parameters they are allowed to use. This mapping is implemented as a hash map where:
 
-- Each key represents a selectivity type identifier.
+- Each key represents a metier identifier.
 
 - Each value is the set of parameter names that are active for that function.
+
+Again, each metier is associated with a selectivity type and this is known a priori. All six selectivity types have their number of parameters; for the example below, all metiers have the same number of parameters but their selectivity type is either 2 or 6. For details on the selectivity types, consult the [BEMTOOL official guide](https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html).
 
 
 ```{r, echo=TRUE, results='asis', message=FALSE}
@@ -521,56 +539,43 @@ library(hash)
 # maps selectivity type -> parameters used
 # -----------------------------------------------------
 selectivity_id <- hash()
-selectivity_id[["1"]] <- list(c("param1", "param2"), c(1, 2))
-selectivity_id[["2"]] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
-selectivity_id[["3"]] <- list(c("param1", "param2"), c(1, 2))
-selectivity_id[["4"]] <- list(c("param1", "param2"), c(1, 2))
-selectivity_id[["5"]] <- list(c("param1", "param2", "param3", "param4", "param5"),
-                              c(1, 2, 3, 4, 5))
-selectivity_id[["6"]] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
+selectivity_id[["DTS"]] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
+selectivity_id[['DFN']] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
+selectivity_id[['HOK']] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
+selectivity_id[['PGP']] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
 
 # -----------------------------------------------------
-# Define selectivity parameters combinations per selectivity type
+# Define selectivity parameters combinations per metier
 # -----------------------------------------------------
-# sel 1
-p11 <- c(10, 15, 20) #seq(15, 20)
-p12 <- c(5, 6) #seq(3, 7)
 
-# sel 2
-p21 <- c(10, 15)
-p22 <- c(7, 8)
-p23 <- c(8, 10)
+# dts
+p_dts_1 <- c(140, 160, 180)
+p_dts_2 <- c(10, 30, 50)
+p_dts_3 <- c(430, 450, 470)
 
-# sel 3
-p31 <- c(20, 25)
-p32 <- c(10, 15)
+# dfn
+p_dfn_1 <- c(360, 380, 400)
+p_dfn_2 <- c(120, 140, 160)
+p_dfn_3 <- c(120, 140, 160)
 
-# sel 4
-p41 <- c(12, 25)
-p42 <- c(6, 7)
-p43 <- c(7, 8)
+# hok
+p_hok_1 <- c(430, 450, 470)
+p_hok_2 <- c(80, 100, 120)
+p_hok_3 <- c(100, 120, 140)
 
-# sel 5
-p51 <- c(12, 25)
-p52 <- c(12, 25)
-p53 <- c(12, 25)
-p54 <- c(12, 25)
-p55 <- c(12, 25)
+# pgp
+p_pgp_1 <- c(360, 380, 400)
+p_pgp_2 <- c(120, 140, 160)
+p_pgp_3 <- c(120, 140, 160)
 
-# sel 6
-p61 <- c(12, 25)
-p62 <- c(10, 20)
-p63 <- c(15, 15)
 
 
 # per-selectivity-type parameters
 params_sel <- hash()
-params_sel[["1"]] <- list(p11, p12)
-params_sel[['2']] <- list(p21, p22, p23)
-params_sel[['3']] <- list(p31, p32)
-params_sel[['4']] <- list(p41, p42, p43)
-params_sel[['5']] <- list(p51, p52, p53, p54, p55)
-params_sel[['6']] <- list(p61, p62, p63)
+params_sel[['DTS']] <- list(p_dts_1, p_dts_2, p_dts_3)
+params_sel[['DFN']] <- list(p_dfn_1, p_dfn_2, p_dfn_3)
+params_sel[['HOK']] <- list(p_hok_1, p_hok_2, p_hok_3)
+params_sel[['PGP']] <- list(p_pgp_1, p_pgp_2, p_pgp_3)
 
 
 ```
@@ -579,7 +584,7 @@ params_sel[['6']] <- list(p61, p62, p63)
 cat('Example of how to specify the selectivity parameters range to use in the creation of different ALADYM configuration files.')
 ```
 
-For example, a logistic function may allow only an inflection age and a slope parameter, whereas a dome-shaped function may allow parameters controlling peak age and curvature. Although the input file contains a fixed number of parameter columns, only the parameters listed in the mapping for the selected type are considered active. The remaining parameter slots are ignored during combination generation and remain fixed at their baseline values.
+These parameters control the shape of the function associated with each selectivity type; for example, HOK is given a selectivity type of 6 which corresponds to a dome-shaped function and consequently its parameters control peak, age and curvature. Although the input file contains a fixed number of parameter columns, only the parameters listed in the mapping for the selected type are considered active. The remaining parameter slots are ignored during combination generation and remain fixed at their baseline values.
 
 During configuration creation, the script performs the following sequence:
 
