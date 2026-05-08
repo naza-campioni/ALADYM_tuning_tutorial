@@ -526,7 +526,7 @@ Since we assume that selectivity is similar across metiers, the configuration-ge
 
 - Each value is the set of parameter names that are active for that function.
 
-Again, each metier is associated with a selectivity type and this is known a priori. All six selectivity types have their number of parameters; for the example below, all metiers have the same number of parameters but their selectivity type is either 2 or 6. For details on the selectivity types, consult the [BEMTOOL official guide](https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html).
+Since each metier could be assigned a different selectivity type based on the target species, it is necessary to provide a selectivity configuration per species. In this example, we configure the selectivity for European hake for GSAs 17-18 where the involved metiers have either selectivity 2 or selectivity 6. Note that, for example, to configure the selectivity for deep-water rose shrimp, the same metier DTS will have a selectivity of type 1 and therefore the number of parameters to provide will be different. For details on the selectivity types, consult the [BEMTOOL official guide](https://coispa.github.io/BEMTOOL_tutorial_SEAwiseWP6/BEMTOOL_tutorialMSE.html).
 
 
 ```{r, echo=TRUE, results='asis', message=FALSE}
@@ -535,18 +535,19 @@ Again, each metier is associated with a selectivity type and this is known a pri
 library(hash)
 
 # -----------------------------------------------------
-# Define selectivity dictionary:
-# maps selectivity type -> parameters used
+# Define selectivity dictionary
 # -----------------------------------------------------
+
 selectivity_id <- hash()
+params_sel <- hash()
+
+#-----------------------------------
+# HKE
+#-----------------------------------
 selectivity_id[["DTS"]] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
 selectivity_id[['DFN']] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
 selectivity_id[['HOK']] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
 selectivity_id[['PGP']] <- list(c("param1", "param2", "param3"), c(1, 2, 3))
-
-# -----------------------------------------------------
-# Define selectivity parameters combinations per metier
-# -----------------------------------------------------
 
 # dts
 p_dts_1 <- c(140, 160, 180)
@@ -568,15 +569,11 @@ p_pgp_1 <- c(360, 380, 400)
 p_pgp_2 <- c(120, 140, 160)
 p_pgp_3 <- c(120, 140, 160)
 
-
-
 # per-selectivity-type parameters
-params_sel <- hash()
 params_sel[['DTS']] <- list(p_dts_1, p_dts_2, p_dts_3)
 params_sel[['DFN']] <- list(p_dfn_1, p_dfn_2, p_dfn_3)
 params_sel[['HOK']] <- list(p_hok_1, p_hok_2, p_hok_3)
 params_sel[['PGP']] <- list(p_pgp_1, p_pgp_2, p_pgp_3)
-
 
 ```
 
