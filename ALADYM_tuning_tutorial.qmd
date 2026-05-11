@@ -208,17 +208,17 @@ These files illustrate the correct ALADYM format and differ from the standard BE
 
 In practice, this means that tuning must be conducted separately for each stock. The workflow (generation of configurations, automated batch runs, score computation and diagnostics) remains identical, but all input data must be prepared independently for each species.
 
-Since the goal of the tuning process is to compare ALADYM outputs to stock assessment outputs, Fbar, SSB and catches `.csv` files need to be provided in the main ALADYM tuning folder (eg, `ALADYM-ver.Tuning`):
+Since the goal of the tuning process is to compare ALADYM outputs to stock assessment outputs, Fbar, SSB and catches `.csv` files need to be provided in the main ALADYM tuning folder (eg, `ALADYM-ver.Tuning`). They *necessarily* need to be saved as `_assessment.csv`; since each stock is run independently, ALADYM will not check whether the assessment files correspond correctly to the analysed species, hence the suggestion is to save each assessment file with the species name in it as shown in the examples below:
 
-<a href="data/catches.csv" download>
+<a href="data/catches_assessment_NEP.csv" download>
 Catches csv example
 </a>
 
-<a href="data/ssb.csv" download>
+<a href="data/ssb_assessment_MUT.csv" download>
 SSB csv example
 </a>
 
-<a href="data/fbar.csv" download>
+<a href="data/fbar_assessment_DPS.csv" download>
 Fbar csv example
 </a>
 

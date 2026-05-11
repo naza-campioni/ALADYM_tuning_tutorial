@@ -417,10 +417,10 @@ document.addEventListener("DOMContentLoaded", function(){
 <p><a href="data/production.csv" download=""> Production csv example </a></p>
 <p>These files illustrate the correct ALADYM format and differ from the standard BEMTOOL input structure. Users should not attempt to reuse BEMTOOL landings files directly without restructuring them into the species-specific ALADYM format.</p>
 <p>In practice, this means that tuning must be conducted separately for each stock. The workflow (generation of configurations, automated batch runs, score computation and diagnostics) remains identical, but all input data must be prepared independently for each species.</p>
-<p>Since the goal of the tuning process is to compare ALADYM outputs to stock assessment outputs, Fbar, SSB and catches <code>.csv</code> files need to be provided in the main ALADYM tuning folder (eg, <code>ALADYM-ver.Tuning</code>):</p>
-<p><a href="data/catches.csv" download=""> Catches csv example </a></p>
-<p><a href="data/ssb.csv" download=""> SSB csv example </a></p>
-<p><a href="data/fbar.csv" download=""> Fbar csv example </a></p>
+<p>Since the goal of the tuning process is to compare ALADYM outputs to stock assessment outputs, Fbar, SSB and catches <code>.csv</code> files need to be provided in the main ALADYM tuning folder (eg, <code>ALADYM-ver.Tuning</code>). They <em>necessarily</em> need to be saved as <code>_assessment.csv</code>; since each stock is run independently, ALADYM will not check whether the assessment files correspond correctly to the analysed species, hence the suggestion is to save each assessment file with the species name in it as shown in the examples below:</p>
+<p><a href="data/catches_assessment_NEP.csv" download=""> Catches csv example </a></p>
+<p><a href="data/ssb_assessment_MUT.csv" download=""> SSB csv example </a></p>
+<p><a href="data/fbar_assessment_DPS.csv" download=""> Fbar csv example </a></p>
 </section>
 <section id="tr-fbar-tuning" class="level1">
 <h1>Tr-Fbar tuning</h1>
