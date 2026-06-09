@@ -1,6 +1,6 @@
 ---
 title: "ALADYM_tuning_tutorial"
-author: "Nazareno Campioni"
+author: "Isabella Bitetto, Nazareno Campioni"
 format: html
 editor: 
   markdown:
